@@ -97,8 +97,7 @@ CLUSTER_NAME   = "fromzerotohero_workshop_cluster"
 fq = f"{NOMBRE_CATALOGO}.{NOMBRE_SCHEMA}"
 PREP_CHECK_VERSION = "2.0-fzth"                  # versión de este setup (se muestra en el informe final)
 
-# Origen de los CSV: la carpeta data/ del Git folder del workspace. El repo es privado (GitHub EMU),
-# así que no se usa la URL raw de GitHub. El notebook se ejecuta desde .../00 - Setup y teardown/notebooks,
+# Origen de los CSV: la carpeta data/ del Git folder del workspace (así el cómputo no necesita salir a Internet). El notebook se ejecuta desde .../00 - Setup y teardown/notebooks,
 # por lo que ../data es la carpeta con los CSV.
 # Override opcional: asigna una ruta absoluta (p.ej. /Workspace/... o /Volumes/...) o una URL http(s) a CSV_OVERRIDE.
 CSV_OVERRIDE = ""
@@ -139,6 +138,7 @@ print(f"Participantes ({len(ATTENDEES)}):".rjust(16), *[f"\t\t- {a}" for a in AT
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 import time
 from urllib.parse import quote
 
@@ -225,6 +225,7 @@ print("Funciones auxiliares definidas.")
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 from databricks.sdk.service.compute import (
     AutoScale, DataSecurityMode, ClusterAccessControlRequest, ClusterPermissionLevel,
 )
@@ -303,6 +304,7 @@ except Exception as e:
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # --- 3b. Catálogo (manejar metastore sin almacenamiento por defecto) -----------
 try:
     w.catalogs.get(NOMBRE_CATALOGO)
@@ -347,6 +349,7 @@ except Exception as e:
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # --- 3d. SQL Warehouse (Ej. 01, 02, 03, 04, 05, 08, 09) -----------------------
 def ensure_warehouse(name):
     existing = next((x for x in w.warehouses.list() if x.name == name), None)
@@ -387,6 +390,7 @@ if WAREHOUSE_ID:
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # --- 3e. Cluster multiuso (notebooks: Setup, Ej. 03, Ej. 06) -----------------
 def ensure_cluster(name):
     existing = next((c for c in w.clusters.list() if c.cluster_name == name), None)
@@ -433,6 +437,7 @@ if CLUSTER_ID:
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {fq} COMMENT 'Base compartida de churn de From Zero to Hero'")
 
 # Prueba de escritura: si el catálogo quedó en un almacenamiento donde este workspace no puede escribir,
@@ -472,6 +477,7 @@ carga("hecho_facturacion", dates=["periodo"], bools=["pago"])
 carga("hecho_ticket_soporte", dates=["fecha_apertura"])
 
 # COMMAND ----------
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # ## 4.2 feature_churn (variables de comportamiento, sin leakage)
 spark.sql(f"""CREATE OR REPLACE TABLE {fq}.feature_churn AS
 WITH u AS (SELECT id_cliente, AVG(logins_mes) uso_promedio, AVG(horas_uso) horas_promedio FROM {fq}.hecho_uso GROUP BY id_cliente),
@@ -486,6 +492,7 @@ JOIN {fq}.dim_plan p ON p.id_plan=a.id_plan
 LEFT JOIN u ON u.id_cliente=c.id_cliente LEFT JOIN f ON f.id_cliente=c.id_cliente LEFT JOIN t ON t.id_cliente=c.id_cliente""")
 
 # COMMAND ----------
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # ## 4.3 Comentarios + constraints (documentación para Genie y Discovery)
 tabc={"dim_cliente":"Dimensión de clientes.","dim_plan":"Dimensión de planes.","dim_fecha":"Dimensión calendario.",
  "hecho_suscripcion":"Suscripciones: una por cliente, con estado y churn.","hecho_uso":"Uso mensual por cliente.",
@@ -512,6 +519,7 @@ for t in ["hecho_suscripcion","hecho_uso","hecho_facturacion","hecho_ticket_sopo
     _run(f"ALTER TABLE {fq}.{t} ADD CONSTRAINT fk_{t}_cli FOREIGN KEY (id_cliente) REFERENCES {fq}.dim_cliente(id_cliente) NOT ENFORCED RELY")
 
 # COMMAND ----------
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # ## 4.4 Base de conocimiento (volumen + documentos)
 spark.sql(f"CREATE VOLUME IF NOT EXISTS {fq}.kb_volume COMMENT 'Base de conocimiento de retención'")
 docs={
@@ -525,6 +533,7 @@ print("Base de conocimiento:", os.listdir(base))
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # --- 4.5 Otorgar LECTURA de la base compartida a la clase ------------------
 # Modelo: los participantes solo tienen lectura en {fq} (sin MODIFY, CREATE TABLE, etc.).
 try:
@@ -554,6 +563,7 @@ except Exception as e:
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 # Reconstruir el mapa grupo->derechos DESPUÉS de la preparación para reflejar el nuevo grupo.
 GROUP_ENTITLEMENTS = {}
 for g in w.groups.list(attributes="displayName,entitlements"):
@@ -647,6 +657,7 @@ display(matrix_df.reset_index())
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 if detail_rows:
     display(pd.DataFrame(detail_rows, columns=["Participante", "Verificación", "Estado", "Detalle"]))
 else:
@@ -675,6 +686,7 @@ else:
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 from databricks.sdk.core import Config
 try:
     w_probe = WorkspaceClient(config=Config(http_timeout_seconds=5, retry_timeout_seconds=5))
@@ -759,6 +771,7 @@ display(pd.DataFrame([{"Funcionalidad": _l, "Estado": _sym(_v)} for _l, _v in fe
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 def _group_has_uc(securable_type, full_name, group, needed):
     try:
         r = w.api_client.do("GET",
@@ -851,6 +864,7 @@ display(pd.DataFrame([{"Ítem": "Versión", "Estado": PREP_CHECK_VERSION}] +
 
 # COMMAND ----------
 
+if "fq" not in globals(): raise RuntimeError("Faltan las celdas del inicio (la sesión se reinició o se ejecutó esta celda sola). Haz clic en Run all, arriba, para ejecutar el notebook desde el principio.")
 print("\n".join([
     "From Zero to Hero · Evidencia del Setup",
     f"Workspace     : {_ws_url}",
