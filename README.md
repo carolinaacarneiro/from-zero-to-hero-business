@@ -17,8 +17,8 @@ Trabajas con los datos de **Conecta+**, una empresa de suscripción ficticia (2.
 planes, uso, facturas y tickets de soporte). Como el caso es genérico, lo que aprendes se aplica a
 cualquier industria.
 
-**Para quién es:** personas de negocio y de datos que están **empezando en Databricks**. No necesitas
-conocimientos previos: cada módulo explica cada componente y te guía **clic a clic**.
+**Para quién es:** personas de negocio y de datos que están **empezando en Databricks**.<br>
+No necesitas conocimientos previos: cada módulo explica cada componente y te guía **clic a clic**.
 
 ## Lo que vas a construir
 
