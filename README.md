@@ -1,30 +1,48 @@
-# Databricks Master Training: Análisis de Clientes y Churn
+# From Zero to Hero · Business Users
 
-![Arquitectura del Master Training en la plataforma Databricks](assets/arquitetura.gif?v=20260928)
+![Logo From Zero to Hero](assets/logo_fzth.png)
 
-Entrenamiento práctico (hands-on) en la plataforma Databricks que lleva al participante desde el SQL self-service hasta los agentes de IA, siempre sobre un mismo desafío de negocio: entender y reducir el churn (cancelación) de clientes.
+**Un día para pasar de cero a construir con datos e IA en Databricks**, sin ser programador.
 
-## Objetivo
+![Arquitectura del entrenamiento en la plataforma Databricks](assets/arquitectura.svg)
 
-Capacitar a equipos de negocio y de datos para usar la plataforma Databricks de punta a punta, en modo **low-code**, y responder una pregunta real: *¿por qué los clientes cancelan y cómo retenerlos?*
+## ¿De qué se trata?
 
-A lo largo de la ruta, el participante:
-- consulta y modela datos de churn (SQL, Metric Views);
-- aplica IA Generativa sobre texto (tickets de soporte);
-- crea dashboards y agentes conversacionales (Genie);
-- entrena un modelo de churn y lo sirve con gobernanza;
-- orquesta todo en un agente Supervisor y entrega una app de retención.
+Un entrenamiento **práctico (hands-on)** en el que construyes, paso a paso y en modo **low-code**,
+una solución completa sobre un mismo desafío de negocio:
 
-El dominio es una empresa de suscripción genérica, por lo que la ruta se adapta a cualquier cliente o industria. Todo el contenido es reproducible en cualquier workspace: los datos vienen de CSV versionados en este repositorio.
+> ### *¿Por qué los clientes cancelan y cómo retenerlos?*
 
-## Arquitectura de datos
+Trabajas con los datos de **Conecta+**, una empresa de suscripción ficticia (2.000 clientes, sus
+planes, uso, facturas y tickets de soporte). Como el caso es genérico, lo que aprendes se aplica a
+cualquier industria.
 
-- **Base compartida** (schema `churn`, solo lectura): se crea una vez en el Setup y la usa toda la clase.
-- **Schema personal por participante** (`<catálogo>.<tu_database>`): recibe lo que cada uno crea en los ejercicios (metric views, modelo, funciones, etc.).
-- Los objetos de workspace (Genie, Supervisor, App) se crean por participante.
+**Para quién es:** personas de negocio y de datos que están **empezando en Databricks**. No necesitas
+conocimientos previos: cada módulo explica cada componente y te guía **clic a clic**.
+
+## Lo que vas a construir
+
+| | Módulo | Qué construyes | Componentes de Databricks |
+|:-:|--------|----------------|---------------------------|
+| 🧭 | **[01 · SQL con IA](./01%20-%20SQL%20con%20IA)** | Exploras los datos y generas SQL a partir de preguntas en español | Unity Catalog, SQL Editor, SQL Warehouse, Genie Code |
+| 🔔 | **[02 · Generación de Alertas](./02%20-%20Generaci%C3%B3n%20de%20Alertas)** | Una alerta que te avisa sola cuando el churn sube | SQL Alerts |
+| 📐 | **[03 · Métricas de Negocio](./03%20-%20M%C3%A9tricas%20de%20Negocio)** | Métricas oficiales de churn, ingresos y soporte | Metric Views |
+| ✍️ | **[04 · IA Generativa en SQL](./04%20-%20IA%20Generativa%20en%20SQL)** | IA que lee los tickets: sentimiento, categoría, datos personales y resumen | AI Functions |
+| 📊 | **[05 · Dashboards con IA](./05%20-%20Dashboards%20con%20IA)** | Un panel ejecutivo de churn armado con prompts | AI/BI Dashboards, Genie Code |
+| 🤖 | **[06 · Predicción de Churn (ML)](./06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29)** | Un modelo que calcula el riesgo de cada cliente | Notebooks, MLflow, Models en Unity Catalog |
+| 💬 | **[07 · Análisis de Datos Multi-Agent](./07%20-%20An%C3%A1lisis%20de%20Datos%20Multi-Agent)** | Dos agentes especialistas que responden en español y una sola puerta de entrada | Genie Agents, Genie One |
+| 🎯 | **[08 · Retención con ML y GenAI](./08%20-%20Retenci%C3%B3n%20con%20ML%20y%20GenAI)** | La oferta correcta y un e-mail personalizado para cada cliente en riesgo | UC Functions, `ai_query` |
+| 🚀 | **[09 · Creación de Apps](./09%20-%20Creaci%C3%B3n%20de%20Apps)** | La **Central de Retención**: la app que une todo | Databricks Apps, Unity Gateway |
+| 🏁 | **[10 · Cierre](./10%20-%20Cierre%20%28Pr%C3%B3ximos%20Pasos%29)** | Lo que construiste y cómo seguir aprendiendo | Databricks Academy |
+
+## Cómo está organizado
+
+- **Base compartida** (`fromzerotohero.churn`, solo lectura): la crea tu administrador una sola vez, antes del evento.
+- **Tu schema personal** (`fromzerotohero.<tu_schema>`): tu espacio de trabajo. Ahí queda todo lo que creas.
+- **Tus objetos del workspace** (dashboard, Genie Agents, app): quedan a tu nombre para que sigas practicando.
 
 <details markdown="1">
-<summary>👉 Tablas de la base compartida churn</summary>
+<summary>👉 Tablas de la base compartida <code>fromzerotohero.churn</code></summary>
 
 | Objeto | Tipo | Contenido |
 |--------|------|----------|
@@ -35,22 +53,11 @@ El dominio es una empresa de suscripción genérica, por lo que la ruta se adapt
 
 </details>
 
-## Ruta de aprendizaje
-
-| Módulo | Contenido |
-|--------|-----------|
-| **00 - Setup y teardown** | Preparación de la base compartida de churn (datos + documentación + base de conocimiento). Empieza por aquí. |
-| **01 - SQL con IA** | Explorar la base en el SQL Editor y generar SQL con el asistente (Genie Code). |
-| **02 - Generación de Alertas** | Crear alertas que se disparan cuando un indicador de churn cruza un umbral. |
-| **03 - Métricas de Negocio** | Definir métricas gobernadas (churn, ingresos, soporte) y consultarlas con MEASURE(). |
-| **04 - IA Generativa en SQL** | IA Generativa en SQL sobre los tickets: sentimiento, clasificación, PII y resumen. |
-| **05 - Dashboards con IA** | Panel ejecutivo de churn en AI/BI, con los gráficos armados por el Asistente (✨) a partir de prompts. |
-| **06 - Predicción de Churn (ML)** | Entrenar y registrar un modelo de probabilidad de churn y generar la tabla de scores que alimenta a los agentes y a la app. |
-| **07 - Análisis de Datos Multi-Agent** | Crear dos Genies (Facturación y Soporte) y un agente Supervisor que los orquesta, enrutando cada pregunta al especialista correcto. |
-| **08 - Retención con ML y GenAI** | Crear funciones gobernadas (UC Functions) que transforman el score en acción: el perfil 360 del cliente y un email de retención personalizado, con las reglas de oferta en SQL y la IA solo en la redacción. |
-| **09 - Creación de Apps** | Publicar la **Central de Retención**: la app que integra todo el entrenamiento. Reúne el Cockpit de churn (mapa + gráficos con lectura por IA), el Asistente (el Supervisor del Ej. 7) y la Retención personalizada (las funciones del Ej. 8), con un único notebook de deploy. La IA de la app pasa por un **model service del Unity Gateway**, gobernado y auditado. |
-| **10 - Cierre (Próximos Pasos)** | Retrospectiva del desafío de churn completado, resumen de todo lo construido y los próximos pasos en la Databricks Academy (Jornada Lakehouse). |
-
 ## Cómo empezar
 
-Abre la carpeta **[`00 - Setup y teardown`](./00%20-%20Setup%20y%20teardown)** y sigue el `README.md` que está ahí.
+| Si eres… | Empieza aquí |
+|----------|--------------|
+| **Administrador** del workspace de tu empresa | [00 · Setup y teardown](./00%20-%20Setup%20y%20teardown): guía del administrador, setup y validación (antes del evento) |
+| **Participante** | 1) Ejecuta la [verificación de ambiente](./00%20-%20Setup%20y%20teardown) (notebook `00_verificar_ambiente`) antes del evento. 2) El día del evento, empieza por el [módulo 01](./01%20-%20SQL%20con%20IA). |
+
+> ***El entrenamiento se ejecuta en el workspace de Databricks de tu empresa (de desarrollo o dedicado al entrenamiento), no en Databricks Free Edition.***

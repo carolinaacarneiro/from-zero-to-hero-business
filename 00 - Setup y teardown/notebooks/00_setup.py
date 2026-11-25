@@ -4,25 +4,43 @@
 # environment_version = "5"
 # ///
 # MAGIC %md
-# MAGIC # Setup del Workshop: Base de Churn + Habilitación de la clase
-# MAGIC Ejecútalo **1 vez** como **administrador de cuenta**. Este notebook hace todo de una vez:
-# MAGIC 1. **Prepara la clase**: grupo `dbacademy_workshop` (participantes + accesos), catálogo,
+# MAGIC # From Zero to Hero · Setup del administrador: base de churn + habilitación de la clase
+# MAGIC
+# MAGIC Este notebook lo ejecuta **una sola vez** el **administrador de la cuenta** de Databricks,
+# MAGIC **antes del evento**. Tarda de **5 a 10 minutos** y deja todo listo para la clase.
+# MAGIC
+# MAGIC ### ✅ Antes de empezar
+# MAGIC | Necesitas | Cómo confirmarlo |
+# MAGIC |---|---|
+# MAGIC | Ser **administrador de cuenta** (account admin) | En el menú de tu usuario (arriba a la derecha) aparece **Manage account** |
+# MAGIC | Un workspace con **Unity Catalog** | En el menú lateral, **Catalog** muestra catálogos |
+# MAGIC | Los participantes ya **agregados al workspace** | **Settings → Identity and access → Users** |
+# MAGIC | Este repositorio clonado como **Git folder** | Lo estás viendo desde **Workspace → … → Git folder** |
+# MAGIC
+# MAGIC ***Usa el workspace corporativo (de desarrollo o dedicado al entrenamiento), no Databricks Free Edition.***
+# MAGIC
+# MAGIC ### Qué hace, en orden
+# MAGIC 1. **Prepara la clase**: grupo `fromzerotohero_workshop` (participantes + accesos), catálogo `fromzerotohero`,
 # MAGIC    SQL Warehouse, cluster multiuso y los permisos.
-# MAGIC 2. **Carga la base COMPARTIDA** `<catálogo>.churn` (CSV → Delta, `feature_churn`,
-# MAGIC    comentarios + PK/FK, volumen de conocimiento) y libera **lectura** para la clase.
-# MAGIC 3. **Verifica** que cada participante tiene lo necesario y que el workspace tiene las funcionalidades
-# MAGIC    de IA usadas en los Ej. 4/6/7 (Model Serving/Foundation Model APIs y Multi-Agent Supervisor).
+# MAGIC 2. **Carga la base COMPARTIDA** `fromzerotohero.churn` (CSV → tablas Delta, `feature_churn`,
+# MAGIC    comentarios + claves, volumen de conocimiento) y da **solo lectura** a la clase.
+# MAGIC 3. **Verifica** cada participante y las funcionalidades de IA del workspace
+# MAGIC    (Foundation Model APIs, Genie Agents, Databricks Apps y Unity Gateway).
 # MAGIC
-# MAGIC **Es idempotente** (create-if-not-exists + grants idempotentes): es seguro volver a ejecutarlo.
+# MAGIC **Es idempotente**: puedes volver a ejecutarlo cuantas veces quieras (por ejemplo, para agregar
+# MAGIC participantes nuevos). No duplica ni borra nada.
 # MAGIC
-# MAGIC ***Este notebook (y el entrenamiento) debe ejecutarse en el workspace corporativo, y no en Databricks Free Edition.***
+# MAGIC ### ▶️ Cómo ejecutarlo
+# MAGIC 1. Conecta el notebook a un cómputo **Serverless** (botón **Connect**, arriba a la derecha).
+# MAGIC 2. Ejecuta las **dos primeras celdas de código** (Shift + Enter en cada una): aparecen los campos arriba.
+# MAGIC 3. En **4. Participantes**, marca a todas las personas del entrenamiento. No cambies los demás campos.
+# MAGIC 4. Haz clic en **Run all**. Al final, la sección **7. Informe final** dice
+# MAGIC    `✅ VERIFICACIONES COMPLETAS` o qué corregir.
+# MAGIC 5. **Copia el bloque "Evidencia del Setup"** del final y envíalo a tu equipo de cuenta de Databricks.
+# MAGIC 6. Pide a cada participante que ejecute `00_verificar_ambiente` (en esta misma carpeta) y te envíe su resultado.
 # MAGIC
-# MAGIC > ⚠️ Ejecuta las **dos primeras celdas** para mostrar los widgets, selecciona los participantes y
-# MAGIC > usa **Run all**. **Todas las celdas deben terminar con éxito.** El veredicto final está en la
-# MAGIC > sección **7. Informe final** (`✅ VERIFICACIONES COMPLETAS`). Si hay ❌/⚠️, corrige y vuelve a ejecutar.
-# MAGIC
-# MAGIC > Las metric views (Ej. 3), el modelo (Ej. 6) y los Genies/Supervisor (Ej. 7) los crea cada participante
-# MAGIC > en su schema personal `<catálogo>.<tu_schema>`, habilitado aquí mediante `CREATE SCHEMA`.
+# MAGIC > Las metric views (Ej. 3), el modelo (Ej. 6), los Genie Agents (Ej. 7) y la app (Ej. 9) los crea
+# MAGIC > cada participante en su schema personal `fromzerotohero.<su_schema>`, habilitado aquí mediante `CREATE SCHEMA`.
 
 # COMMAND ----------
 
@@ -43,8 +61,8 @@ _attendee_opts = [_PICK_ATT] + _user_choices
 print(f"Se encontraron {len(_user_choices)} usuario(s) del workspace para el selector de participantes.")
 more_than_1024_users = len(_attendee_opts) > 1024
 if more_than_1024_users:
-    print("⚠️  Este workspace tiene más usuarios de los que admite el widget de selección múltiple. "
-          "Será necesario completar la lista de participantes manualmente en la siguiente celda.")
+    print("⚠️  Este workspace tiene más usuarios de los que admite el selector múltiple. "
+          "En el campo '4. Participantes' escribe los e-mails separados por coma.")
 
 # COMMAND ----------
 
@@ -52,14 +70,13 @@ if more_than_1024_users:
 # (Si ves "widget already exists with a different type", usa Edit -> Clear all widget values
 #  una vez y vuelve a ejecutar esta celda.)
 dbutils.widgets.dropdown("create_catalog", "true", ["true", "false"], "1. Crear catálogo")
+dbutils.widgets.text("managed_location", "", "1b. Ubicación gestionada (opcional)")
 dbutils.widgets.dropdown("create_warehouse", "true", ["true", "false"], "2. Crear SQL Warehouse")
 dbutils.widgets.dropdown("create_cluster", "true", ["true", "false"], "3. Crear cluster multiuso")
 if not more_than_1024_users:
     dbutils.widgets.multiselect("attendees", _PICK_ATT, _attendee_opts, "4. Participantes (usuarios del workspace)")
 else:
-    attendees_manual = [
-        # completa esta lista con los emails de los participantes solo si se indica en la celda de arriba
-    ]
+    dbutils.widgets.text("attendees", "", "4. Participantes (e-mails separados por coma)")
 
 # COMMAND ----------
 
@@ -72,13 +89,13 @@ else:
 # Convenciones fijas para los recursos que este notebook gestiona.
 import os
 
-NOMBRE_CATALOGO = "dbacademy"               # catálogo de Unity Catalog de destino
+NOMBRE_CATALOGO = "fromzerotohero"               # catálogo de Unity Catalog de destino
 NOMBRE_SCHEMA   = "churn"                   # schema COMPARTIDO (solo lectura para los participantes)
-GROUP          = "dbacademy_workshop"
-WAREHOUSE_NAME = "dbacademy_workshop_wh"
-CLUSTER_NAME   = "dbacademy_workshop_cluster"
+GROUP          = "fromzerotohero_workshop"
+WAREHOUSE_NAME = "fromzerotohero_workshop_wh"
+CLUSTER_NAME   = "fromzerotohero_workshop_cluster"
 fq = f"{NOMBRE_CATALOGO}.{NOMBRE_SCHEMA}"
-PREP_CHECK_VERSION = "1.5"                  # versión de este setup (se muestra en el informe final)
+PREP_CHECK_VERSION = "2.0-fzth"                  # versión de este setup (se muestra en el informe final)
 
 # Origen de los CSV: la carpeta data/ del Git folder del workspace. El repo es privado (GitHub EMU),
 # así que no se usa la URL raw de GitHub. El notebook se ejecuta desde .../00 - Setup y teardown/notebooks,
@@ -92,10 +109,11 @@ if not CSV_BASE.startswith(("http://", "https://")) and not os.path.isdir(CSV_BA
         "(ver el README del módulo 00) o define CSV_OVERRIDE.")
 
 CREATE_CATALOG   = dbutils.widgets.get("create_catalog") == "true"
+MANAGED_LOCATION = dbutils.widgets.get("managed_location").strip()  # ej.: s3://mi-bucket/fromzerotohero
 CREATE_WAREHOUSE = dbutils.widgets.get("create_warehouse") == "true"
 CREATE_CLUSTER   = dbutils.widgets.get("create_cluster") == "true"
-ATTENDEES = ([a.strip() for a in dbutils.widgets.get("attendees").split(",")
-              if a.strip() and a.strip() != _PICK_ATT] if not more_than_1024_users else attendees_manual)
+ATTENDEES = [a.strip() for a in dbutils.widgets.get("attendees").split(",")
+             if a.strip() and a.strip() != _PICK_ATT]
 
 if not ATTENDEES:
     dbutils.notebook.exit("⏳ Elige al menos un participante arriba y ejecuta 'Run all'.")
@@ -294,7 +312,8 @@ except Exception as _e:
         raise  # 403, timeout, etc.: no es "el catálogo no existe"
     if CREATE_CATALOG:
         try:
-            spark.sql(f"CREATE CATALOG IF NOT EXISTS {NOMBRE_CATALOGO}")
+            _loc = f" MANAGED LOCATION '{MANAGED_LOCATION}'" if MANAGED_LOCATION else ""
+            spark.sql(f"CREATE CATALOG IF NOT EXISTS {NOMBRE_CATALOGO}{_loc}")
             print(f"{OK} Catálogo '{NOMBRE_CATALOGO}' listo.")
         except Exception as e:
             msg = str(e).lower()
@@ -303,7 +322,7 @@ except Exception as _e:
                 raise RuntimeError(
                     f"Catálogo '{NOMBRE_CATALOGO}' no puede crearse automáticamente: este metastore no "
                     f"tiene almacenamiento por defecto, así que necesita una UBICACIÓN GESTIONADA explícita. Créalo a mano "
-                    f"(Catalog Explorer → Create catalog → Default Storage), o bien:\n"
+                    f"(Catalog → botón + → Create a catalog; en 'Storage location' elige una ubicación), o bien:\n"
                     f"    CREATE CATALOG {NOMBRE_CATALOGO} MANAGED LOCATION 'gs://<bucket>/<path>';\n"
                     f"luego vuelve a ejecutar con 'Crear catálogo' = false.") from e
             raise
@@ -328,7 +347,7 @@ except Exception as e:
 
 # COMMAND ----------
 
-# --- 3d. SQL Warehouse (Ej. 01, 02, 04, 05, 06) ------------------------------
+# --- 3d. SQL Warehouse (Ej. 01, 02, 03, 04, 05, 08, 09) -----------------------
 def ensure_warehouse(name):
     existing = next((x for x in w.warehouses.list() if x.name == name), None)
     if existing:
@@ -361,8 +380,8 @@ else:
 if WAREHOUSE_ID:
     try:
         w.warehouses.update_permissions(warehouse_id=WAREHOUSE_ID, access_control_list=[
-            WarehouseAccessControlRequest(group_name=GROUP, permission_level=WarehousePermissionLevel.CAN_MANAGE)])
-        print(f"{OK} CAN_MANAGE del warehouse otorgado a {GROUP}.")
+            WarehouseAccessControlRequest(group_name=GROUP, permission_level=WarehousePermissionLevel.CAN_USE)])
+        print(f"{OK} CAN_USE del warehouse otorgado a {GROUP}.")
     except Exception as e:
         print(f"{NO} No fue posible otorgar permiso de warehouse: {e}")
 
@@ -414,7 +433,21 @@ if CLUSTER_ID:
 
 # COMMAND ----------
 
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {fq} COMMENT 'Base compartida de churn del Master Training'")
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {fq} COMMENT 'Base compartida de churn de From Zero to Hero'")
+
+# Prueba de escritura: si el catálogo quedó en un almacenamiento donde este workspace no puede escribir,
+# lo avisamos aquí con una instrucción clara (y no en medio de la carga).
+try:
+    spark.sql(f"CREATE OR REPLACE TABLE {fq}._prueba_escritura AS SELECT 1 AS ok")
+    spark.sql(f"DROP TABLE {fq}._prueba_escritura")
+except Exception as _e:
+    if "403" in str(_e) or "UNAUTHORIZED_ACCESS" in str(_e) or "PERMISSION_DENIED" in str(_e):
+        raise RuntimeError(
+            f"El workspace no puede escribir en el almacenamiento del catálogo '{NOMBRE_CATALOGO}'. Suele pasar "
+            "cuando el catálogo usa el almacenamiento raíz del metastore. Solución: elimina el catálogo (si está vacío), "
+            "completa el campo '1b. Ubicación gestionada' con una ruta de una External Location del workspace "
+            "(Catalog → External Data → External Locations) y vuelve a hacer Run all.") from _e
+    raise
 
 # ## 4.1 Carga de los CSV (Git folder) → tablas Delta
 import pandas as pd
@@ -623,21 +656,25 @@ else:
 
 # MAGIC %md
 # MAGIC ## 6. Funcionalidades de IA del workspace
-# MAGIC Funcionalidades del **workspace completo** (no por participante), necesarias para los Ej. 4, 6 y 7:
+# MAGIC Funcionalidades del **workspace completo** (no por participante) que usa el entrenamiento:
 # MAGIC | Funcionalidad | Señal | Necesaria por |
 # MAGIC |---|---|---|
 # MAGIC | Model Serving / Foundation Model APIs | `serving_endpoints.list()` funciona vs `NotFound` | 4 (AI Functions) |
-# MAGIC | Endpoints del `ai_query` (Ej. 4) | `databricks-meta-llama-3-3-70b-instruct` y `databricks-gpt-oss-120b` presentes en la lista | 4 (pasos 1c, 2b) |
-# MAGIC | Multi-Agent Supervisor (Agent Bricks) | se habilita junto con Knowledge Assistant (`GET /knowledge-assistants` responde vs 404) | 7 (Supervisor) |
+# MAGIC | Endpoints del `ai_query` (Ej. 4 y 8) | `databricks-meta-llama-3-3-70b-instruct` y `databricks-gpt-oss-120b` presentes | 4, 8 |
+# MAGIC | Genie Agents | `GET /api/2.0/genie/spaces` responde | 5, 7, 9 |
+# MAGIC | Databricks Apps | `GET /api/2.0/apps` responde | 9 |
+# MAGIC | Unity Gateway (model services) | una llamada real a `system.ai.gpt-oss-20b` responde | 9 |
 # MAGIC
 # MAGIC > El registro del modelo en UC (Ej. 6) usa el Model Registry de Unity Catalog, inherente a
 # MAGIC > workspaces con UC, sin sondeo dedicado. El Ej. 6 **no** crea endpoint de serving.
+# MAGIC >
+# MAGIC > **Genie One** (Ej. 7, Parte 3) es la interfaz para usuarios de negocio: se abre en el selector de apps
+# MAGIC > (arriba a la derecha) → **Genie One**, o en `<url-del-workspace>/one`. A nivel de workspace, el acceso
+# MAGIC > depende de que el usuario sea miembro del workspace con un derecho de acceso (el grupo de la clase ya
+# MAGIC > recibe `workspace-access`). Verifícalo abriendo Genie One una vez antes del evento.
 
 # COMMAND ----------
 
-# El list del Multi-Agent Supervisor responde [] incluso en regiones sin la funcionalidad, así que no sirve de
-# condición; derivamos MAS del Knowledge Assistant (se habilita junto, y su 404 es una señal clara). Cliente con timeout
-# corto para que el sondeo no bloquee el notebook durante minutos en regiones sin la funcionalidad.
 from databricks.sdk.core import Config
 try:
     w_probe = WorkspaceClient(config=Config(http_timeout_seconds=5, retry_timeout_seconds=5))
@@ -654,7 +691,7 @@ def _feature_probe(path, attempts=2):
         except Exception as e:
             s, tn = str(e), type(e).__name__
             if "Timeout" in tn or "Timed out" in s:
-                last = False; continue  # región sin la funcionalidad (o fallo transitorio: reintenta)
+                last = None; continue  # indeterminado (puede ser un fallo transitorio): reintenta
             if "NotFound" in tn or "404" in s:
                 return False  # API no disponible: funcionalidad no habilitada
             if "403" in s or "PERMISSION_DENIED" in s or "not authorized" in s.lower():
@@ -662,8 +699,8 @@ def _feature_probe(path, attempts=2):
             return None  # indeterminado
     return last
 
-# El Ej. 4 ejecuta ai_query contra estos endpoints (pasos 1c y 2b). Si no están aprovisionados
-# en la región/workspace, el ejercicio falla; por eso verificamos que existan, no solo que la API responda.
+# El Ej. 4 ejecuta ai_query contra estos endpoints. Si no están aprovisionados en la región/workspace,
+# el ejercicio falla; por eso verificamos que existan, no solo que la API responda.
 EX4_QUERY_ENDPOINTS = ["databricks-meta-llama-3-3-70b-instruct", "databricks-gpt-oss-120b"]
 EX4_OPTIONAL = ["databricks-claude-haiku-4-5"]  # tercera opción citada en el Ej. 4 (no se ejecuta por defecto)
 
@@ -682,13 +719,32 @@ if SERVING_OK and _missing_ex4:
 _opt = [n for n in EX4_OPTIONAL if n in _ep_ready]
 print(f"ℹ️  Opción adicional del Ej. 4 presente: {', '.join(_opt) if _opt else 'ninguna (databricks-claude-haiku-4-5)'}")
 
-KA_OK = _feature_probe("/api/2.1/knowledge-assistants")
-MAS_OK = KA_OK  # se habilita junto con KA
+GENIE_OK = _feature_probe("/api/2.0/genie/spaces?page_size=1")
+APPS_OK = _feature_probe("/api/2.0/apps?page_size=1")
+# Unity Gateway: llamada real al modelo que usa el model service del Ej. 9 (misma ruta que la app).
+import requests
+try:
+    try:
+        _ws_url = "https://" + spark.conf.get("spark.databricks.workspaceUrl")  # URL del workspace (no la regional)
+    except Exception:
+        _ws_url = w.config.host.rstrip("/")
+    _r = requests.post(f"{_ws_url}/ai-gateway/mlflow/v1/chat/completions", timeout=60,
+                       headers={**w.config.authenticate(), "Content-Type": "application/json"},
+                       json={"model": "system.ai.gpt-oss-20b", "max_tokens": 200,
+                             "messages": [{"role": "user", "content": "Responde solo: OK"}]})
+    if _r.status_code != 200:
+        raise RuntimeError(f"HTTP {_r.status_code}: {_r.text[:150]}")
+    GATEWAY_OK = True
+except Exception as _e:
+    print(f"{NO} Unity Gateway (system.ai.gpt-oss-20b) no respondió: {str(_e)[:160]}")
+    GATEWAY_OK = None if "Timeout" in type(_e).__name__ else False
 
 feature_report = [
     ("Model Serving / Foundation Model APIs: AI Functions (Ej. 4)", SERVING_OK),
     ("Endpoints del ai_query del Ej. 4 (llama-3-3-70b + gpt-oss-120b)", EX4_OK),
-    ("Multi-Agent Supervisor / Agent Bricks (Ej. 7)", MAS_OK),
+    ("Genie Agents (Ej. 5, 7, 9)", GENIE_OK),
+    ("Databricks Apps (Ej. 9)", APPS_OK),
+    ("Unity Gateway: modelo system.ai.gpt-oss-20b (Ej. 9)", GATEWAY_OK),
 ]
 print(f"Funcionalidades de IA. Leyenda: {OK} disponible  {NO} no disponible  {ERR} indeterminado")
 display(pd.DataFrame([{"Funcionalidad": _l, "Estado": _sym(_v)} for _l, _v in feature_report],
@@ -786,3 +842,20 @@ else:
 print("=" * 70)
 display(pd.DataFrame([{"Ítem": "Versión", "Estado": PREP_CHECK_VERSION}] +
                      [{"Ítem": label, "Estado": _sym(val)} for label, val in report], columns=["Ítem", "Estado"]))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 8. Evidencia del Setup
+# MAGIC Copia este bloque y envíalo a tu equipo de cuenta de Databricks.
+
+# COMMAND ----------
+
+print("\n".join([
+    "From Zero to Hero · Evidencia del Setup",
+    f"Workspace     : {_ws_url}",
+    f"Versión setup : {PREP_CHECK_VERSION}",
+    f"Participantes : {len(ATTENDEES)}",
+    f"Resultado     : {'✅ VERIFICACIONES COMPLETAS' if _all_ok else '❌ ENTORNO NO LISTO'}",
+    "-" * 50,
+] + [f"{_sym(v)} {label}" for label, v in report]))

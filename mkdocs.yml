@@ -1,13 +1,13 @@
-site_name: Databricks Master Training
-site_description: Ruta práctica de Análisis de Clientes y Churn en la plataforma Databricks
-# URL pública del sitio. PLACEHOLDER: apunta al repo nuevo hasta que se configure GitHub Pages.
-site_url: https://github.com/carolina-carneiro_data/Databricks-Master-Training-ES/
-repo_url: https://github.com/carolina-carneiro_data/Databricks-Master-Training-ES
+site_name: From Zero to Hero · Business Users
+site_description: Entrenamiento hands-on de Databricks para usuarios de negocio — Análisis de Clientes y Churn
+# URL pública del sitio (GitHub Pages). Se publica cuando el repositorio pasa a ser público.
+site_url: https://carolinaacarneiro.github.io/from-zero-to-hero-business/
+repo_url: https://github.com/carolinaacarneiro/from-zero-to-hero-business
 edit_uri: edit/main/
 
 # Enlace en el pie para la preparación de la clase. Ruta absoluta desde la raíz
 # del sitio (mismo nombre de repositorio que en el sitio publicado).
-copyright: '<a href="/Databricks-Master-Training-ES/00%20-%20Setup%20y%20teardown/">00 - Setup y teardown</a>'
+copyright: '<a href="/from-zero-to-hero-business/00%20-%20Setup%20y%20teardown/">00 - Setup y teardown</a>'
 
 # El repositorio completo es la fuente de la documentación (los READMEs quedan intactos).
 # Por eso el sitio debe construirse FUERA del árbol del repo (MkDocs rechaza un site_dir
@@ -20,7 +20,6 @@ site_dir: ../site
 exclude_docs: |
   requirements-docs.txt
   mkdocs.yml
-  GLOSARIO_PT_ES.md
 
 theme:
   name: material

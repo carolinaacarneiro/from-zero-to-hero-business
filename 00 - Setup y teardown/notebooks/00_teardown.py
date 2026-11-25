@@ -4,17 +4,20 @@
 # environment_version = "5"
 # ///
 # MAGIC %md
-# MAGIC # Desmontaje del Workshop: Base de Churn + clase (`00_setup`)
+# MAGIC # From Zero to Hero · Desmontaje: base de churn + clase (`00_setup`)
 # MAGIC
 # MAGIC Revierte los recursos creados por `00_setup`. **Idempotente**: cualquier cosa
 # MAGIC que ya no exista se omite, por lo que es seguro volver a ejecutarlo.
 # MAGIC
 # MAGIC Cada interruptor es `true`/`false`. Los valores por defecto eliminan los recursos **específicos del workshop**
-# MAGIC (grupo, warehouse, cluster). Eliminar el grupo también revoca todos los permisos otorgados a él.
+# MAGIC (grupo, warehouse, cluster y las apps `central-retencion-*` del Ej. 9). Eliminar el grupo también
+# MAGIC revoca todos los permisos otorgados a él. Los model services (Ej. 9) viven en el schema de cada
+# MAGIC participante y se borran junto con el catálogo (opción 4). Los Genie Agents (Ej. 7) y los dashboards
+# MAGIC (Ej. 5) son objetos del workspace de cada participante: se conservan.
 # MAGIC
-# MAGIC ⚠️ **`DROP CATALOG dbacademy` por defecto es `false`**: el catálogo pertenece al administrador y contiene
-# MAGIC tanto la base COMPARTIDA `dbacademy.churn` (tablas + volumen `kb_volume`) como el schema personal
-# MAGIC `dbacademy.<username>` de cada participante y sus datos. Defínelo como `true` solo si el notebook
+# MAGIC ⚠️ **`DROP CATALOG fromzerotohero` por defecto es `false`**: el catálogo pertenece al administrador y contiene
+# MAGIC tanto la base COMPARTIDA `fromzerotohero.churn` (tablas + volumen `kb_volume`) como el schema personal
+# MAGIC `fromzerotohero.<username>` de cada participante y sus datos. Defínelo como `true` solo si el notebook
 # MAGIC de preparación creó el catálogo y el workshop terminó por completo.
 
 # COMMAND ----------
@@ -28,6 +31,7 @@ dbutils.widgets.dropdown("delete_group", "true", ["true", "false"], "1. Eliminar
 dbutils.widgets.dropdown("delete_warehouse", "true", ["true", "false"], "2. Eliminar SQL Warehouse")
 dbutils.widgets.dropdown("delete_cluster", "true", ["true", "false"], "3. Eliminar cluster multiuso")
 dbutils.widgets.dropdown("delete_catalog", "false", ["true", "false"], "4. ELIMINAR CATÁLOGO (DESTRUCTIVO)")
+dbutils.widgets.dropdown("delete_apps", "true", ["true", "false"], "5. Eliminar apps de la clase (central-retencion-*)")
 
 # COMMAND ----------
 
@@ -36,18 +40,20 @@ from databricks.sdk import WorkspaceClient
 w = WorkspaceClient()
 
 # Convenciones fijas, deben coincidir con el notebook de preparación.
-CATALOG = "dbacademy"
+CATALOG = "fromzerotohero"
 SCHEMA = "churn"
 SCHEMA_FULL_NAME = f"{CATALOG}.{SCHEMA}"
 VOLUME_FULL_NAME = f"{SCHEMA_FULL_NAME}.kb_volume"
-GROUP = "dbacademy_workshop"
-WAREHOUSE_NAME = "dbacademy_workshop_wh"
-CLUSTER_NAME = "dbacademy_workshop_cluster"
+GROUP = "fromzerotohero_workshop"
+WAREHOUSE_NAME = "fromzerotohero_workshop_wh"
+CLUSTER_NAME = "fromzerotohero_workshop_cluster"
 
 DELETE_GROUP = dbutils.widgets.get("delete_group") == "true"
 DELETE_WAREHOUSE = dbutils.widgets.get("delete_warehouse") == "true"
 DELETE_CLUSTER = dbutils.widgets.get("delete_cluster") == "true"
 DELETE_CATALOG = dbutils.widgets.get("delete_catalog") == "true"
+DELETE_APPS = dbutils.widgets.get("delete_apps") == "true"
+APP_PREFIX = "central-retencion-"
 
 OK, NO, ERR, NA = "✅", "❌", "⚠️", "➖"
 
@@ -69,6 +75,26 @@ print(f"Catálogo:  {CATALOG}          (ELIMINAR={DELETE_CATALOG})  {'⚠️ DES
 print("=" * 70)
 print("DESMONTAJE")
 print("=" * 70)
+
+# --- Apps de la clase (Ej. 9): consumen cómputo mientras existan -------------
+if DELETE_APPS:
+    _apps = [a for a in w.apps.list() if (a.name or "").startswith(APP_PREFIX)]
+    for _a in _apps:
+        try:
+            w.apps.delete(name=_a.name)
+            print(f"{OK} App '{_a.name}' eliminada.")
+        except Exception as e:
+            print(f"{NO} No fue posible eliminar la app '{_a.name}': {e}")
+    if not _apps:
+        print(f"{OK} No hay apps '{APP_PREFIX}*' para eliminar.")
+    else:
+        import time
+        for _ in range(18):  # el borrado es asíncrono: esperamos hasta ~3 min a que desaparezcan
+            if not any((a.name or "").startswith(APP_PREFIX) for a in w.apps.list()):
+                break
+            time.sleep(10)
+else:
+    print(f"{NA} Apps de la clase conservadas (eliminar=false).")
 
 # --- Cluster ---------------------------------------------------------------
 if DELETE_CLUSTER:
@@ -116,9 +142,12 @@ if DELETE_GROUP:
     if _found:
         _gid = _found[0]["id"]
         try:
-            w.api_client.do("DELETE", f"/api/2.0/preview/permissionassignments/principals/{_gid}")
-        except Exception:
-            pass  # la asignación quizás ya fue removida
+            # Quitar el grupo del workspace: PUT con la lista de permisos vacía (método documentado).
+            w.api_client.do("PUT", f"/api/2.0/preview/permissionassignments/principals/{_gid}",
+                            body={"permissions": []})
+            print(f"{OK} Grupo '{GROUP}' retirado de este workspace.")
+        except Exception as e:
+            print(f"{NA} No fue posible retirar el grupo del workspace (quizás ya fue retirado): {str(e)[:120]}")
         try:
             _acct_scim("DELETE", f"/Groups/{_gid}")
             print(f"{OK} Grupo de cuenta '{GROUP}' (id {_gid}) eliminado. Sus permisos y membresías también fueron eliminados.")
@@ -180,6 +209,7 @@ report = [
     _row(f"Warehouse '{WAREHOUSE_NAME}'",   DELETE_WAREHOUSE, any(x.name == WAREHOUSE_NAME for x in w.warehouses.list())),
     _row(f"Grupo '{GROUP}'",                DELETE_GROUP,     _account_group_exists(GROUP)),
     _row(f"Catálogo '{CATALOG}'",           DELETE_CATALOG,   _catalog_present),
+    _row(f"Apps '{APP_PREFIX}*'",           DELETE_APPS,      any((a.name or "").startswith(APP_PREFIX) for a in w.apps.list())),
 ]
 
 _done = all(r["Estado"] in (OK, NA) for r in report)

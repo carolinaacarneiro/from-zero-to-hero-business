@@ -1,33 +1,26 @@
-// Mapa de LATAM (Leaflet + tiles oscuros ArcGIS World_Dark_Gray_Base, igual a la demo Cargill).
-// Una burbuja por región: tamaño según el nº de clientes, color según la intensidad de riesgo,
-// número = clientes en riesgo Alto. Tooltip "Región — X clientes · Y en riesgo". Clic selecciona la región.
+// Mapa de LATAM (Leaflet + tiles oscuros de ArcGIS, sin API key). Una burbuja por región: tamaño según el número de
+// clientes, color propio de la región, número = clientes en riesgo Alto. Clic selecciona la región.
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import type { RegionDatos } from "../api";
 import { nf } from "../api";
 
-// Coordenadas aproximadas (centro) de cada región del mapa.
-const GEO: Record<string, [number, number]> = {
+export const GEO: Record<string, [number, number]> = {
   "México": [23, -102],
-  "Centroamérica": [11, -85],
-  "Caribe": [18.5, -70.5],
-  "Andina": [-2, -76],
-  "Cono Sur": [-34, -64],
+  "Centroamérica": [12, -85.5],
+  "Caribe": [18.6, -70.5],
+  "Andina": [-3, -76],
+  "Cono Sur": [-33, -63],
 };
-// Sombra por región (más oscuro = más en riesgo), calibrada en el mock.
-const SHADE: Record<string, string> = {
-  "Andina": "#E8412B",
-  "México": "#F2604A",
-  "Cono Sur": "#F98C79",
-  "Centroamérica": "#FCB4A6",
-  "Caribe": "#FED2C9",
+export const COLOR: Record<string, string> = {
+  "México": "#ff5a36",
+  "Andina": "#ff3d8b",
+  "Cono Sur": "#8b5cf6",
+  "Centroamérica": "#22d3ee",
+  "Caribe": "#fbbf24",
 };
 
-type Props = {
-  D: Record<string, RegionDatos>;
-  seleccionada: string;
-  onSelect: (reg: string) => void;
-};
+type Props = { D: Record<string, RegionDatos>; seleccionada: string; onSelect: (reg: string) => void };
 
 export function MapaLatam({ D, seleccionada, onSelect }: Props) {
   const elRef = useRef<HTMLDivElement | null>(null);
@@ -36,65 +29,42 @@ export function MapaLatam({ D, seleccionada, onSelect }: Props) {
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
 
-  function burbujaIcon(reg: string, sel: boolean) {
+  const icono = (reg: string, sel: boolean) => {
     const d = D[reg];
-    const size = Math.round(30 + (d.clientes - 150) / 500 * 36);
+    const size = Math.max(34, Math.min(74, Math.round(30 + (d.clientes / 900) * 44)));
     return L.divIcon({
       className: "",
       iconSize: [size, size],
       iconAnchor: [size / 2, size / 2],
-      html: `<div class="burbuja ${sel ? "burbuja-sel" : ""}" style="width:${size}px;height:${size}px;background:${SHADE[reg]};position:relative"><span style="font-size:${size > 46 ? 13 : 11}px">${d.riesgo}</span></div>`,
+      html: `<div class="burbuja ${sel ? "sel" : ""}" style="--c:${COLOR[reg]};width:${size}px;height:${size}px;font-size:${size > 50 ? 14 : 12}px">${d.riesgo}</div>`,
     });
-  }
+  };
 
-  // inicialización del mapa (una vez)
   useEffect(() => {
     if (!elRef.current || mapRef.current) return;
-    const lmap = L.map(elRef.current, {
-      zoomControl: false,
-      attributionControl: false,
-      scrollWheelZoom: false,
-    }).setView([-5, -80], 3);
-    L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-      { maxZoom: 16 }
-    ).addTo(lmap);
-    // encuadra de México a Argentina
-    lmap.fitBounds([
-      [25, -108],
-      [-36, -62],
-    ]);
-    mapRef.current = lmap;
-    return () => {
-      lmap.remove();
-      mapRef.current = null;
-      markersRef.current = {};
-    };
+    const m = L.map(elRef.current, { zoomControl: false, attributionControl: false, scrollWheelZoom: false });
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom: 12 }).addTo(m);
+    m.fitBounds([[27, -110], [-38, -58]]);
+    mapRef.current = m;
+    return () => { m.remove(); mapRef.current = null; markersRef.current = {}; };
   }, []);
 
-  // (re)crea las burbujas cuando llegan los datos
   useEffect(() => {
-    const lmap = mapRef.current;
-    if (!lmap || !D || !D["México"]) return;
-    Object.values(markersRef.current).forEach((m) => m.remove());
+    const m = mapRef.current;
+    if (!m || !D?.["México"]) return;
+    Object.values(markersRef.current).forEach((mk) => mk.remove());
     markersRef.current = {};
     Object.keys(GEO).forEach((reg) => {
-      const m = L.marker(GEO[reg], { icon: burbujaIcon(reg, reg === seleccionada) }).addTo(lmap);
-      m.bindTooltip(
-        `<b>${reg}</b><br>${nf(D[reg].clientes)} clientes · ${nf(D[reg].riesgo)} en riesgo`,
-        { direction: "top", offset: [0, -6] }
-      );
-      m.on("click", () => onSelectRef.current(reg));
-      markersRef.current[reg] = m;
+      const mk = L.marker(GEO[reg], { icon: icono(reg, reg === seleccionada) }).addTo(m);
+      mk.bindTooltip(`<b>${reg}</b><br>${nf(D[reg].clientes)} clientes · ${nf(D[reg].riesgo)} en riesgo alto`, { direction: "top", offset: [0, -8] });
+      mk.on("click", () => onSelectRef.current(reg));
+      markersRef.current[reg] = mk;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [D]);
 
-  // resalta la región seleccionada
   useEffect(() => {
-    Object.keys(markersRef.current).forEach((reg) =>
-      markersRef.current[reg].setIcon(burbujaIcon(reg, reg === seleccionada))
-    );
+    Object.keys(markersRef.current).forEach((reg) => markersRef.current[reg].setIcon(icono(reg, reg === seleccionada)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seleccionada, D]);
 

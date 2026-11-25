@@ -1,0 +1,17 @@
+{
+  "name": "central-retencion",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Central de Retención — From Zero to Hero (Databricks App en Node.js)",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@databricks/sql": "1.17.0",
+    "express": "^4.22.3"
+  }
+}

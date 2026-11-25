@@ -1,40 +1,53 @@
-# 04 - IA Generativa en SQL
+# 04 · IA Generativa en SQL
 
-![Recorrido del Master Training con énfasis en lo construido hasta el Ejercicio 04](../assets/04%20-%20arquitetura.gif?v=20260928)
+![Ruta From Zero to Hero con énfasis en lo construido hasta el Ejercicio 04](../assets/arquitectura_04.svg)
 
-> _Resaltado, lo que ya construiste en el recorrido hasta este punto; en gris, lo que todavía viene._
+> _Resaltado, lo que ya construiste en la ruta hasta este punto; en gris, lo que todavía viene._
 
-Vamos a aplicar **IA Generativa directo en SQL** sobre el texto de los tickets de soporte (la "voz del cliente"), sin entrenar modelos y sin salir del SQL Editor.
+**⏱️ Tiempo:** 35 min · **📍 Dónde:** SQL Editor · **🧰 Lo que usas:** AI Functions, `ai_query`, Genie Code
 
-> Puedes encontrar todas las consultas usadas aquí en [`ai_functions.sql`](./ai_functions.sql)
+Los tickets de soporte tienen la **voz del cliente**: textos libres como *"me cobraron dos veces"* o *"excelente atención"*. Leerlos uno por uno es imposible. Aquí vas a usar **IA Generativa directamente en SQL** para entender esos textos, sin entrenar modelos y sin salir del SQL Editor.
 
-## Objetivo
-Usar las **AI Functions** de Databricks para analizar el campo `texto_reclamo` de la tabla `hecho_ticket_soporte`:
-- `ai_analyze_sentiment`: sentimiento (positive / neutral / negative)
-- `ai_classify`: clasificar el asunto del ticket
-- `ai_mask`: enmascarar datos personales (PII)
-- `ai_summarize`: resumir los principales problemas
+## 🎯 Al terminar vas a…
+- Clasificar el **sentimiento** de cada ticket (positivo, neutral, negativo)
+- **Clasificar** el asunto del ticket en categorías que tú defines
+- **Enmascarar** datos personales (PII) como e-mails y teléfonos
+- **Resumir** 100 tickets en un párrafo
+- Elegir **qué modelo de IA** usar con `ai_query`
 
-> Las funciones llaman a un modelo de IA, así que pueden tardar unos segundos por fila. Por eso las consultas usan `LIMIT`
+## 🧠 Conceptos de Databricks de este módulo
+
+| Concepto | Qué es |
+|----------|--------|
+| **IA Generativa / LLM** | Modelos de IA que entienden y escriben texto (como un ChatGPT). **LLM** = *Large Language Model* |
+| **AI Functions** | Funciones SQL listas que llaman a un LLM por ti: `ai_analyze_sentiment`, `ai_classify`, `ai_mask`, `ai_summarize`… Se usan como cualquier función SQL |
+| **`ai_query`** | La AI Function "comodín": le das **el modelo** y **la instrucción (prompt)**, y devuelve la respuesta |
+| **Foundation Model APIs** | Los modelos de IA que Databricks ofrece listos para usar (Llama, GPT OSS, Claude…), cada uno con un nombre de *endpoint* como `databricks-gpt-oss-120b` |
+| **PII** | *Personally Identifiable Information*: datos que identifican a una persona (nombre, e-mail, teléfono) |
+
+> 💡 **¿Por qué en SQL?** Porque así la IA trabaja **donde ya están los datos**, sobre miles de filas a la vez, y el resultado se convierte en una columna más que puedes contar, filtrar y cruzar con el churn.
+
+## ✅ Antes de empezar
+- Completaste el [Ej. 1](../01%20-%20SQL%20con%20IA)
+- Abre el **SQL Editor** con el warehouse **`fromzerotohero_workshop_wh`** seleccionado (si no sabes cómo, mira el Paso 2 del Ej. 1)
+
+> ⏳ Cada llamada a la IA tarda un poco por fila. Por eso las consultas usan **muestras pequeñas** (`LIMIT`).
+
+Para cada consulta: **copia (ícono de dos cuadrados en la esquina del bloque) → pega en el SQL Editor → Run**.
 
 ---
-
-## Paso 0: Abrir el SQL Editor
-1. En el menú lateral izquierdo, selecciona **SQL Editor**
-2. Deberías quedar redirigido al editor con una consulta; si no, crea una con **SQL Query** debajo de **Create New**
-
-Para cada consulta de este ejercicio, copia la consulta haciendo clic en el ícono de dos cuadrados en la esquina del bloque, pégala en el SQL Editor y ejecútala.
 
 ## Paso 1: Análisis de sentimiento
 
 ### 1a. Sentimiento con `ai_analyze_sentiment`
+La consulta toma 2 tickets con CSAT 5 (muy satisfechos), 2 con CSAT 3 y 2 con CSAT 1 (muy insatisfechos), y le pide a la IA el sentimiento de cada uno.
 ```sql
 WITH muestra AS (
-    ( SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+    ( SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    ( SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+    ( SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    ( SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
+    ( SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     LEFT(texto_reclamo, 60) AS fragmento,
@@ -43,26 +56,24 @@ SELECT
 FROM muestra
 ORDER BY csat DESC;
 ```
-Resultado:
+✅ **Checkpoint:** el sentimiento acompaña la calificación:
 - `csat 5 → positive`
-- `csat 3 → neutral`
+- `csat 3 → neutral` (o `mixed`)
 - `csat 1 → negative`
 
-El sentimiento acompaña la calificación.
+> 💡 `ai_analyze_sentiment` puede devolver **positive**, **neutral**, **negative** o **mixed** (cuando el texto tiene de todo). El `ORDER BY id_ticket` garantiza que todo el grupo vea **los mismos** tickets.
 
-> **Consejo:** usamos una muestra variada (csat 5, 3 y 1) a propósito, para ver a la IA distinguiendo los casos. Si ordenas solo por los peores tickets, todo vuelve negativo. El `ORDER BY id_ticket` garantiza que todo el grupo vea los **mismos** tickets: sin él, el `LIMIT 2` toma filas cualesquiera, y algunos tickets de csat 3 tienen texto positivo ("Estoy satisfecho...").
-
-### 1b. Distribución de sentimiento con Genie Code (últimos 100)
-Ahora vamos a pedirle el SQL a Genie Code en lugar de escribirlo:
-1. Abre Genie Code haciendo clic en el ícono de la bombilla en la esquina superior derecha
-2. Pega el prompt de abajo
-3. Revisa el SQL generado y ejecútalo
+### 1b. Distribución de sentimiento con Genie Code
+Ahora no escribas SQL: pídeselo a **Genie Code**.
+1. Arriba a la derecha, haz clic en el botón de **Genie Code**: se abre el panel a la derecha
+2. Pega el prompt de abajo y presiona **Enter**
+3. Revisa el SQL generado, llévalo al editor y haz clic en **Run**
 ```text
-Usando la tabla dbacademy.churn.hecho_ticket_soporte, escribe una consulta que aplique ai_analyze_sentiment a la columna texto_reclamo de los últimos 100 tickets (por fecha_apertura) y cuente cuántos son positivos, neutros y negativos.
+Usando la tabla fromzerotohero.churn.hecho_ticket_soporte, escribe una consulta que aplique ai_analyze_sentiment a la columna texto_reclamo de los últimos 100 tickets (por fecha_apertura) y cuente cuántos son positivos, neutros y negativos.
 ```
 
-<details>
-<summary>👉 Resultado esperado:</summary>
+<details markdown="1">
+<summary>👉 Resultado esperado</summary>
 
 ```sql
 SELECT
@@ -71,7 +82,7 @@ SELECT
 FROM (
     SELECT
         ai_analyze_sentiment(texto_reclamo) AS sentimiento
-    FROM dbacademy.churn.hecho_ticket_soporte
+    FROM fromzerotohero.churn.hecho_ticket_soporte
     ORDER BY fecha_apertura DESC
     LIMIT 100
 )
@@ -79,29 +90,25 @@ GROUP BY sentimiento
 ORDER BY cant DESC;
 ```
 
+Aproximadamente (puede variar 1 o 2 porque es IA): **~32 positive · ~36 neutral · ~32 negative**.
+
 </details>
 
-Resultado esperado (últimos 100), que puede variar 1–2 porque se trata de IA:
-- **~32** positive
-- **~36** neutral
-- **~32** negative
+> 💡 El texto libre se convirtió en un **indicador que se puede contar**, y lo generaste solo describiendo lo que querías.
 
-> El texto libre se convirtió en un indicador contable, y generaste la consulta solo describiendo lo que querías
-
-### 1c. Sentimiento con un modelo específico: `ai_query`
-1. Copia la consulta de abajo
-2. Cambia el 1º argumento de `ai_query` por uno de estos modelos:
-    - `databricks-claude-haiku-4-5` (Claude)
-    - `databricks-meta-llama-3-3-70b-instruct` (Llama)
-    - `databricks-gpt-oss-120b` (OpenAI)
-3. Ejecuta la consulta
+### 1c. Elegir el modelo con `ai_query`
+Las funciones de arriba usan un modelo que Databricks elige por ti. Con `ai_query` **tú eliges el modelo** y escribes la instrucción.
+1. Copia la consulta de abajo y ejecútala (usa el modelo **Llama**)
+2. Cambia el **primer argumento** de `ai_query` por otro modelo y vuelve a ejecutar:
+    - `databricks-gpt-oss-120b` (OpenAI GPT OSS)
+    - `databricks-claude-haiku-4-5` (Anthropic Claude)
 ```sql
 WITH muestra AS (
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     csat,
@@ -113,23 +120,21 @@ SELECT
 FROM muestra
 ORDER BY csat DESC;
 ```
-Resultado (Claude):
-- `csat 5 → Positive`
-- `csat 3 → Neutral`
-- `csat 1 → Negative`
+✅ **Checkpoint (ejemplo):** `csat 5 → Positive`, `csat 3 → Neutral`, `csat 1 → Negative`. Cada modelo puede escribir con mayúscula o minúscula: lo importante es el sentido.
 
-Las funciones de los pasos anteriores usan el modelo predeterminado de Databricks. Con `ai_query` eliges qué modelo usar.
+> 💡 **¿Qué es un prompt?** Es la instrucción en texto que le das al modelo. Aquí, el prompt le dice qué hacer (*clasifica…*), cómo responder (*solo con la palabra*) y sobre qué texto (`|| texto_reclamo` pega el texto de cada ticket).
 
-## Paso 2: Clasificación
+## Paso 2: Clasificación del asunto
 
 ### 2a. Clasificación con `ai_classify`
+Tú defines las categorías posibles y la IA elige una para cada ticket.
 ```sql
 WITH muestra AS (
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     LEFT(texto_reclamo, 60) AS fragmento,
@@ -138,20 +143,19 @@ SELECT
 FROM muestra
 ORDER BY csat DESC;
 ```
-La IA lee el texto libre y elige una de las categorías que definiste (ej.: un elogio → `Elogio`, "ya pedí la cancelación…" → `Cancelación`).
+✅ **Checkpoint:** un elogio → `Elogio`; *"ya pedí la cancelación…"* → `Cancelación`.
 
-### 2b. Clasificación con un modelo específico: `ai_query`
-La misma idea del 1c, ahora clasificando el asunto:
-1. Copia la consulta de abajo
-2. Cambia el 1º argumento de `ai_query` por uno de los modelos del 1c
-3. Ejecuta la consulta
+> 💡 Usamos la forma simple de `ai_classify` (lista de categorías con `ARRAY(...)`), que devuelve una sola palabra. Existe una versión más nueva (2.1) que acepta descripciones por categoría, varias etiquetas y nivel de confianza, y devuelve un objeto JSON. Para empezar, la forma simple es la más clara.
+
+### 2b. Clasificación con un modelo específico (`ai_query`)
+La misma idea del 1c, ahora clasificando el asunto con GPT OSS (prueba también con los otros modelos):
 ```sql
 WITH muestra AS (
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamo, csat FROM dbacademy.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
+    (SELECT texto_reclamo, csat FROM fromzerotohero.churn.hecho_ticket_soporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     csat,
@@ -163,36 +167,32 @@ SELECT
 FROM muestra
 ORDER BY csat DESC;
 ```
-Resultado (GPT-OSS):
-- `csat 5 → Elogio`
-- `csat 3 → Consulta`
-- `csat 1 → Cancelación`
+✅ **Checkpoint (ejemplo):** `csat 5 → Elogio`, `csat 3 → Consulta`, `csat 1 → Cancelación`.
 
-> Uno de los tickets de csat 1 dice *"Ya pedí la cancelación y me siguen cobrando"*. Habla de cancelación **y** de cobranza, así que el modelo puede clasificarlo como **Cobranza**. Ambas respuestas son defendibles: por eso vale la pena elegir bien las categorías (y el modelo) para tu caso.
+> 💡 Uno de los tickets con csat 1 dice *"Ya pedí la cancelación y me siguen cobrando"*: habla de cancelación **y** de cobranza, así que algún modelo puede responder **Cobranza**. Las dos respuestas son defendibles: por eso conviene elegir bien las categorías (y el modelo) para tu caso.
 
-## Paso 3: Enmascaramiento de PII con `ai_mask`
+## Paso 3: Enmascarar datos personales con `ai_mask`
+Le dices qué tipos de datos personales buscar y la IA los reemplaza por `[MASKED]`.
 ```sql
 SELECT
     ai_mask(texto_reclamo, ARRAY('person','phone','email')) AS texto_anonimizado
-FROM dbacademy.churn.hecho_ticket_soporte
+FROM fromzerotohero.churn.hecho_ticket_soporte
 WHERE texto_reclamo LIKE '%@%' OR texto_reclamo LIKE '%+52%'
 LIMIT 5;
 ```
-Ej.: *"Mi email es c00015@ejemplo.com y todavía no recibo respuesta."* → *"Mi email es **[MASKED]** y todavía no recibo respuesta."*
+✅ **Checkpoint:** *"Mi email es c00015@ejemplo.com y todavía no recibo respuesta."* → *"Mi email es **[MASKED]** y todavía no recibo respuesta."*
 
-Ideal para compartir datos de soporte sin exponer información personal: un puente hacia la gobernanza de Unity Catalog.
+> 💡 **¿Para qué sirve?** Para compartir datos de soporte con otras áreas (o con un proveedor) sin exponer información personal. El `WHERE` busca textos con `@` (e-mails) o `+52` (teléfonos de México).
 
-## Paso 4: Resumen de comentarios con Genie Code y `ai_summarize`
-Nuevamente, vamos a pedirle el SQL a Genie Code:
-1. Abre Genie Code haciendo clic en el ícono de la bombilla en la esquina superior derecha
-2. Pega el prompt de abajo
-3. Revisa el SQL generado y ejecútalo
+## Paso 4: Resumir 100 comentarios con Genie Code y `ai_summarize`
+1. En el panel de **Genie Code**, pega el prompt de abajo
+2. Revisa el SQL, llévalo al editor y haz clic en **Run**
 ```text
-Usando la tabla dbacademy.churn.hecho_ticket_soporte, genera una consulta que tome los últimos 100 comentarios y use ai_summarize para resumir lo que dicen los clientes.
+Usando la tabla fromzerotohero.churn.hecho_ticket_soporte, genera una consulta que tome los últimos 100 comentarios y use ai_summarize para resumir lo que dicen los clientes.
 ```
 
-<details>
-<summary>👉 Resultado esperado:</summary>
+<details markdown="1">
+<summary>👉 Resultado esperado</summary>
 
 ```sql
 SELECT
@@ -200,25 +200,42 @@ SELECT
 FROM (
     SELECT
         texto_reclamo
-    FROM dbacademy.churn.hecho_ticket_soporte
+    FROM fromzerotohero.churn.hecho_ticket_soporte
     ORDER BY fecha_apertura DESC
     LIMIT 100
 );
 ```
 
+Devuelve algo como:
+> *"Los últimos 100 tickets revelan que los clientes reportan sobre todo problemas de atención, cobros indebidos e inestabilidad del servicio, aunque también hay elogios al soporte y a la calidad de la atención."*
+
 </details>
 
-Devuelve algo como:
-> *"Los últimos 100 tickets revelan que los clientes reportan sobre todo problemas de atención, cobros indebidos e inestabilidad del servicio, aunque también hay registros de elogios al soporte y a la calidad de la atención."*
-
-En lugar de leer 100 tickets, tienes el panorama en un párrafo, y generaste la consulta solo describiendo lo que querías.
+> 💡 `collect_list` junta los 100 textos en una lista, `array_join` los une en un solo texto separado por `|`, y `ai_summarize` lo resume en hasta 150 palabras. En lugar de leer 100 tickets, tienes el panorama en un párrafo.
 
 ---
 
 ## 🎯 Desafío
-Estás recibiendo muchos comentarios negativos y eso está afectando la relación con tus clientes. Muestra cómo puedes seleccionar 50 comentarios negativos y generar respuestas para ellos.
+Estás recibiendo muchos comentarios negativos y eso afecta la relación con tus clientes. Usando **Genie Code + AI Functions**, selecciona **50 comentarios negativos** y genera una **respuesta empática** para cada uno.
 
-**Consejo:** Genie Code + AI Functions 😉
+<details markdown="1">
+<summary>💡 Pista</summary>
 
-## Explora
-Las AI Functions transforman texto libre en datos estructurados: el sentimiento y la categoría se convierten en columnas que puedes agregar, filtrar y cruzar con el churn. Esa "señal" de la voz del cliente se usará más adelante en el modelo (Ej. 6) y en los agentes.
+Pídele a Genie Code algo como: *"Usando fromzerotohero.churn.hecho_ticket_soporte, filtra 50 tickets cuyo ai_analyze_sentiment sea negative y genera con ai_query (modelo databricks-gpt-oss-120b) una respuesta empática en español para cada uno."*
+
+</details>
+
+## 🧯 Si algo sale mal
+| Síntoma | Qué hacer |
+|---------|-----------|
+| `ENDPOINT_NOT_FOUND` o el modelo no responde | Ese modelo no está disponible en tu región: usa otro de la lista del 1c |
+| `AI functions are not supported on classic SQL warehouses` | Elige el warehouse `fromzerotohero_workshop_wh` (serverless / pro) |
+| La consulta tarda mucho | Es normal: cada fila es una llamada a la IA. Mantén el `LIMIT` |
+| Resultados distintos a los esperados | La IA no es 100% determinista: lo importante es que el sentido coincida |
+
+## 📌 Lo que aprendiste
+- Las **AI Functions** aplican IA Generativa a miles de filas, directo en SQL
+- Con `ai_query` eliges el modelo y escribes tu propio prompt
+- El texto libre se convierte en columnas que puedes contar y cruzar con el churn: esa señal se usa después en el modelo (Ej. 6) y en los agentes
+
+> Todas las consultas de este módulo están en [`ai_functions.sql`](./ai_functions.sql).

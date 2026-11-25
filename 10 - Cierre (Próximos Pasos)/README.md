@@ -1,12 +1,12 @@
-# 10 - Cierre (Próximos Pasos)
+# 10 · Cierre (Próximos Pasos)
 
-![Arquitectura completa del Master Training: todo lo que construiste](../assets/10%20-%20arquitetura.gif?v=20260928)
+![Arquitectura completa de From Zero to Hero: todo lo que construiste](../assets/arquitectura_10.svg)
 
 > _La plataforma completa que construiste a lo largo de la ruta, desde el dato crudo hasta la app de retención._
 
 ## 🎉 ¡Felicidades!
 
-Llegaste al final del **Master Training**. Partiendo de una sola pregunta de negocio (*¿por qué los clientes cancelan y cómo retenerlos?*), recorriste la plataforma Databricks de punta a punta, en modo **low-code**, y entregaste un producto de retención completo.
+Llegaste al final de **From Zero to Hero**. ¡Ahora eres un hero! 🦸 Partiendo de una sola pregunta de negocio (*¿por qué los clientes cancelan y cómo retenerlos?*), recorriste la plataforma Databricks de punta a punta, en modo **low-code**, y entregaste un producto de retención completo.
 
 ## El desafío de churn, resuelto
 
@@ -28,9 +28,9 @@ Cerraste el ciclo **Detectar → Diagnosticar → Decidir → Actuar**, siempre 
 | **04 · IA Generativa en SQL** | AI Functions sobre los tickets: sentimiento, categoría, PII y resumen |
 | **05 · Dashboards con IA** | Panel ejecutivo de churn en AI/BI, armado a partir de prompts |
 | **06 · Predicción de Churn (ML)** | Modelo de probabilidad de churn + la tabla `churn_scores` |
-| **07 · Análisis de Datos Multi-Agent** | Dos Genies (Facturación y Soporte) + un Supervisor que los orquesta |
+| **07 · Análisis de Datos Multi-Agent** | Dos Genie Agents (Facturación y Soporte) y Genie One como una sola puerta de entrada |
 | **08 · Retención con ML y GenAI** | UC Functions: el perfil 360 del cliente y el email de retención personalizado |
-| **09 · Creación de Apps** | La **Central de Retención**: Cockpit + Asistente + Retención, en un único deploy, con la IA pasando por un model service del Unity Gateway |
+| **09 · Creación de Apps** | La **Central de Retención**: Cockpit + Asistente (router entre tus Genies) + Retención, en un único deploy, con la IA pasando por un model service del Unity Gateway |
 
 Es el mismo patrón que llevas a cualquier caso de uso e industria: **datos → métricas → IA → agentes → app**, todo gobernado por Unity Catalog.
 

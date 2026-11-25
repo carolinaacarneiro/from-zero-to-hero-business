@@ -1,8 +1,26 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Ejercicio 3 — Metric Views (métricas gobernadas)
-# MAGIC Crea `mvw_churn`, `mvw_ingresos` y `mvw_soporte` en **tu schema personal**, leyendo de la base
-# MAGIC compartida `dbacademy.churn`. Luego consulta con `MEASURE()`.
+# MAGIC
+# MAGIC Este notebook crea **tres metric views** en **tu schema personal**, leyendo de la base compartida
+# MAGIC `fromzerotohero.churn`, y después las consulta con `MEASURE()`.
+# MAGIC
+# MAGIC | Metric view | Medidas | Dimensiones (por dónde cortar) |
+# MAGIC |---|---|---|
+# MAGIC | `mvw_churn` | Cancelaciones, Clientes, Tasa de Churn | Segmento, Plan, Mes |
+# MAGIC | `mvw_ingresos` | Ingresos, Morosidad, Ticket Promedio | Segmento, Mes |
+# MAGIC | `mvw_soporte` | Tickets, CSAT Promedio, NPS Promedio | Segmento, Canal, Categoría |
+# MAGIC
+# MAGIC ### ¿Qué es una Metric View?
+# MAGIC Una **view especial** de Unity Catalog que guarda la **definición oficial** de cada métrica.
+# MAGIC Separa las **dimensiones** (por dónde cortar: segmento, plan, mes) de las **medidas** (qué
+# MAGIC calcular: tasa de churn, ingresos). Se escribe una vez, en **YAML** (un formato de texto
+# MAGIC ordenado), y todos la reutilizan: SQL, dashboards y Genie Agents usan la misma fórmula.
+# MAGIC
+# MAGIC ### ▶️ Cómo ejecutarlo
+# MAGIC 1. Arriba a la derecha, haz clic en **Connect** y elige `fromzerotohero_workshop_cluster`.
+# MAGIC 2. Ejecuta la celda de abajo (**Shift + Enter**): aparece el campo **Tu schema** arriba del notebook.
+# MAGIC 3. Escribe tu schema (ej.: `ggarcia`) y haz clic en **Run all**.
 
 # COMMAND ----------
 
@@ -12,16 +30,21 @@ dbutils.widgets.text("schema", "", "Tu schema")
 
 # MAGIC %md
 # MAGIC ## 1. Crear las metric views
+# MAGIC Cada celda de abajo crea una metric view. Lee la primera con calma:
+# MAGIC - `source`: la tabla principal (los hechos).
+# MAGIC - `joins`: las tablas que se unen para traer más información (por ejemplo, el segmento del cliente).
+# MAGIC - `dimensions`: las columnas por las que vas a cortar los números.
+# MAGIC - `measures`: las fórmulas de las métricas.
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS IDENTIFIER('dbacademy.' || :schema)
+# MAGIC CREATE SCHEMA IF NOT EXISTS IDENTIFIER('fromzerotohero.' || :schema)
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :schema || '.mvw_churn') (
+# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('fromzerotohero.' || :schema || '.mvw_churn') (
 # MAGIC   `Segmento`      COMMENT 'Segmento del cliente',
 # MAGIC   `Plan`          COMMENT 'Nombre del plan',
 # MAGIC   `Mes`           COMMENT 'Mes de la cancelación',
@@ -31,13 +54,13 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # MAGIC ) WITH METRICS LANGUAGE YAML
 # MAGIC COMMENT 'Métricas de churn/retención' AS $$
 # MAGIC version: 0.1
-# MAGIC source: dbacademy.churn.hecho_suscripcion
+# MAGIC source: fromzerotohero.churn.hecho_suscripcion
 # MAGIC joins:
 # MAGIC   - name: cliente
-# MAGIC     source: dbacademy.churn.dim_cliente
+# MAGIC     source: fromzerotohero.churn.dim_cliente
 # MAGIC     'on': source.id_cliente = cliente.id_cliente
 # MAGIC   - name: plan
-# MAGIC     source: dbacademy.churn.dim_plan
+# MAGIC     source: fromzerotohero.churn.dim_plan
 # MAGIC     'on': source.id_plan = plan.id_plan
 # MAGIC dimensions:
 # MAGIC   - name: Segmento
@@ -58,7 +81,7 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :schema || '.mvw_ingresos') (
+# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('fromzerotohero.' || :schema || '.mvw_ingresos') (
 # MAGIC   `Segmento`       COMMENT 'Segmento del cliente',
 # MAGIC   `Mes`            COMMENT 'Periodo (mes)',
 # MAGIC   `Ingresos`       COMMENT 'Suma facturada',
@@ -67,10 +90,10 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # MAGIC ) WITH METRICS LANGUAGE YAML
 # MAGIC COMMENT 'Métricas de ingresos' AS $$
 # MAGIC version: 0.1
-# MAGIC source: dbacademy.churn.hecho_facturacion
+# MAGIC source: fromzerotohero.churn.hecho_facturacion
 # MAGIC joins:
 # MAGIC   - name: cliente
-# MAGIC     source: dbacademy.churn.dim_cliente
+# MAGIC     source: fromzerotohero.churn.dim_cliente
 # MAGIC     'on': source.id_cliente = cliente.id_cliente
 # MAGIC dimensions:
 # MAGIC   - name: Segmento
@@ -89,7 +112,7 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :schema || '.mvw_soporte') (
+# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('fromzerotohero.' || :schema || '.mvw_soporte') (
 # MAGIC   `Segmento`      COMMENT 'Segmento del cliente',
 # MAGIC   `Canal`         COMMENT 'Canal del ticket',
 # MAGIC   `Categoría`     COMMENT 'Categoría del ticket',
@@ -99,10 +122,10 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # MAGIC ) WITH METRICS LANGUAGE YAML
 # MAGIC COMMENT 'Métricas de atención' AS $$
 # MAGIC version: 0.1
-# MAGIC source: dbacademy.churn.hecho_ticket_soporte
+# MAGIC source: fromzerotohero.churn.hecho_ticket_soporte
 # MAGIC joins:
 # MAGIC   - name: cliente
-# MAGIC     source: dbacademy.churn.dim_cliente
+# MAGIC     source: fromzerotohero.churn.dim_cliente
 # MAGIC     'on': source.id_cliente = cliente.id_cliente
 # MAGIC dimensions:
 # MAGIC   - name: Segmento
@@ -124,15 +147,8 @@ dbutils.widgets.text("schema", "", "Tu schema")
 
 # MAGIC %md
 # MAGIC ## 2. Consultar con MEASURE()
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC -- Tasa de churn por segmento
-# MAGIC SELECT `Segmento`, ROUND(MEASURE(`Tasa de Churn`), 3) AS tasa_churn
-# MAGIC FROM IDENTIFIER('dbacademy.' || :schema || '.mvw_churn')
-# MAGIC GROUP BY `Segmento`
-# MAGIC ORDER BY tasa_churn DESC
+# MAGIC Para usar una medida, la pides por su **nombre** con `MEASURE()` y eliges las dimensiones en el
+# MAGIC `GROUP BY`. No repites la fórmula: la metric view ya la sabe.
 
 # COMMAND ----------
 
@@ -141,7 +157,7 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # MAGIC SELECT `Segmento`,
 # MAGIC        ROUND(MEASURE(`Ingresos`), 2)  AS ingresos,
 # MAGIC        ROUND(MEASURE(`Morosidad`), 3) AS morosidad
-# MAGIC FROM IDENTIFIER('dbacademy.' || :schema || '.mvw_ingresos')
+# MAGIC FROM IDENTIFIER('fromzerotohero.' || :schema || '.mvw_ingresos')
 # MAGIC GROUP BY `Segmento`
 # MAGIC ORDER BY ingresos DESC
 
@@ -153,10 +169,11 @@ dbutils.widgets.text("schema", "", "Tu schema")
 # MAGIC        MEASURE(`Tickets`)                 AS tickets,
 # MAGIC        ROUND(MEASURE(`CSAT Promedio`), 2) AS csat,
 # MAGIC        ROUND(MEASURE(`NPS Promedio`), 2)  AS nps
-# MAGIC FROM IDENTIFIER('dbacademy.' || :schema || '.mvw_soporte')
+# MAGIC FROM IDENTIFIER('fromzerotohero.' || :schema || '.mvw_soporte')
 # MAGIC GROUP BY `Categoría`
 # MAGIC ORDER BY tickets DESC
 
 # COMMAND ----------
 
-print(f"✅ Metric views creadas en dbacademy.{dbutils.widgets.get('schema')}")
+print(f"✅ Metric views creadas en fromzerotohero.{dbutils.widgets.get('schema')}: mvw_churn, mvw_ingresos, mvw_soporte")
+print("   Vuelve al README del Ej. 3 para el Paso 2 (antes × después).")

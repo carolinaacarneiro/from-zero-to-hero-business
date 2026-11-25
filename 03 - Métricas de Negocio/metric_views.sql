@@ -1,11 +1,11 @@
 -- Ejercicio 3 — Metric Views
--- Fuente (solo lectura): dbacademy.churn
+-- Fuente (solo lectura): fromzerotohero.churn
 -- Las views se crean en TU schema personal: reemplaza <tu_schema> por tu database.
 
 -- =====================================================================
 -- 1) mvw_churn — métricas de churn/retención
 -- =====================================================================
-CREATE OR REPLACE VIEW dbacademy.<tu_schema>.mvw_churn (
+CREATE OR REPLACE VIEW fromzerotohero.<tu_schema>.mvw_churn (
   `Segmento`      COMMENT 'Segmento del cliente',
   `Plan`          COMMENT 'Nombre del plan',
   `Mes`           COMMENT 'Mes de la cancelación',
@@ -15,13 +15,13 @@ CREATE OR REPLACE VIEW dbacademy.<tu_schema>.mvw_churn (
 ) WITH METRICS LANGUAGE YAML
 COMMENT 'Métricas de churn/retención' AS $$
 version: 0.1
-source: dbacademy.churn.hecho_suscripcion
+source: fromzerotohero.churn.hecho_suscripcion
 joins:
   - name: cliente
-    source: dbacademy.churn.dim_cliente
+    source: fromzerotohero.churn.dim_cliente
     'on': source.id_cliente = cliente.id_cliente
   - name: plan
-    source: dbacademy.churn.dim_plan
+    source: fromzerotohero.churn.dim_plan
     'on': source.id_plan = plan.id_plan
 dimensions:
   - name: Segmento
@@ -42,7 +42,7 @@ $$;
 -- =====================================================================
 -- 2) mvw_ingresos — métricas de ingresos y morosidad
 -- =====================================================================
-CREATE OR REPLACE VIEW dbacademy.<tu_schema>.mvw_ingresos (
+CREATE OR REPLACE VIEW fromzerotohero.<tu_schema>.mvw_ingresos (
   `Segmento`       COMMENT 'Segmento del cliente',
   `Mes`            COMMENT 'Periodo (mes)',
   `Ingresos`       COMMENT 'Suma facturada',
@@ -51,10 +51,10 @@ CREATE OR REPLACE VIEW dbacademy.<tu_schema>.mvw_ingresos (
 ) WITH METRICS LANGUAGE YAML
 COMMENT 'Métricas de ingresos' AS $$
 version: 0.1
-source: dbacademy.churn.hecho_facturacion
+source: fromzerotohero.churn.hecho_facturacion
 joins:
   - name: cliente
-    source: dbacademy.churn.dim_cliente
+    source: fromzerotohero.churn.dim_cliente
     'on': source.id_cliente = cliente.id_cliente
 dimensions:
   - name: Segmento
@@ -73,7 +73,7 @@ $$;
 -- =====================================================================
 -- 3) mvw_soporte — métricas de atención
 -- =====================================================================
-CREATE OR REPLACE VIEW dbacademy.<tu_schema>.mvw_soporte (
+CREATE OR REPLACE VIEW fromzerotohero.<tu_schema>.mvw_soporte (
   `Segmento`      COMMENT 'Segmento del cliente',
   `Canal`         COMMENT 'Canal del ticket',
   `Categoría`     COMMENT 'Categoría del ticket',
@@ -83,10 +83,10 @@ CREATE OR REPLACE VIEW dbacademy.<tu_schema>.mvw_soporte (
 ) WITH METRICS LANGUAGE YAML
 COMMENT 'Métricas de atención' AS $$
 version: 0.1
-source: dbacademy.churn.hecho_ticket_soporte
+source: fromzerotohero.churn.hecho_ticket_soporte
 joins:
   - name: cliente
-    source: dbacademy.churn.dim_cliente
+    source: fromzerotohero.churn.dim_cliente
     'on': source.id_cliente = cliente.id_cliente
 dimensions:
   - name: Segmento
@@ -109,7 +109,7 @@ $$;
 -- =====================================================================
 -- Tasa de churn por segmento
 SELECT `Segmento`, ROUND(MEASURE(`Tasa de Churn`), 3) AS tasa_churn
-FROM dbacademy.<tu_schema>.mvw_churn
+FROM fromzerotohero.<tu_schema>.mvw_churn
 GROUP BY `Segmento`
 ORDER BY tasa_churn DESC;
 
@@ -117,7 +117,7 @@ ORDER BY tasa_churn DESC;
 SELECT `Segmento`,
        ROUND(MEASURE(`Ingresos`), 2)  AS ingresos,
        ROUND(MEASURE(`Morosidad`), 3) AS morosidad
-FROM dbacademy.<tu_schema>.mvw_ingresos
+FROM fromzerotohero.<tu_schema>.mvw_ingresos
 GROUP BY `Segmento`
 ORDER BY ingresos DESC;
 
@@ -126,6 +126,6 @@ SELECT `Categoría`,
        MEASURE(`Tickets`)                  AS tickets,
        ROUND(MEASURE(`CSAT Promedio`), 2)  AS csat,
        ROUND(MEASURE(`NPS Promedio`), 2)   AS nps
-FROM dbacademy.<tu_schema>.mvw_soporte
+FROM fromzerotohero.<tu_schema>.mvw_soporte
 GROUP BY `Categoría`
 ORDER BY tickets DESC;

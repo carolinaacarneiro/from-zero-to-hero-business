@@ -1,53 +1,60 @@
-# 05 - Dashboards con IA
+# 05 · Dashboards con IA
 
-![Recorrido del Master Training con énfasis en lo construido hasta el Ejercicio 05](../assets/05%20-%20arquitetura.gif?v=20260928)
+![Ruta From Zero to Hero con énfasis en lo construido hasta el Ejercicio 05](../assets/arquitectura_05.svg)
 
-> _Resaltado, lo que ya construiste en el recorrido hasta este punto; en gris, lo que todavía viene._
+> _Resaltado, lo que ya construiste en la ruta hasta este punto; en gris, lo que todavía viene._
 
-Vamos a transformar los datos de churn en un **panel ejecutivo**: dejas que **Genie** arme los gráficos a partir de prompts y reutilizas la metric view que creaste en el Ej. 3. Tú describes los análisis, él los arma; tú solo ajustas y publicas.
+**⏱️ Tiempo:** 40 min · **📍 Dónde:** Dashboards · **🧰 Lo que usas:** AI/BI Dashboards, Genie Code, tu metric view del Ej. 3
 
-**Requisitos previos:**
-- [Ej. 1 - SQL con IA](../01%20-%20SQL%20con%20IA)
-- [Ej. 3 - Métricas de Negocio](../03%20-%20M%C3%A9tricas%20de%20Negocio)
+Vas a transformar los datos de churn en un **panel ejecutivo**. No vas a arrastrar gráficos uno por uno: vas a **describir** lo que quieres y **Genie Code** lo arma, reutilizando la métrica gobernada que creaste en el Ej. 3. Tú revisas, ajustas y publicas.
 
-## Objetivo
-Construir un **dashboard AI/BI** de retención con:
-- Un KPI de tasa de churn
-- Churn por plan y por segmento
-- Cancelaciones a lo largo del tiempo
-- Un mapa de churn por región
-- 2 filtros (plan y segmento) que vuelven interactivo el panel
-- El logo del curso en la parte superior
+## 🎯 Al terminar vas a…
+- Tener un **dashboard** publicado con KPI, gráficos de churn por plan, segmento y mes, un mapa y filtros
+- Ver cómo **corregir una métrica una sola vez** cambia todos los gráficos que la usan
 
-> Los primeros 4 análisis salen directo de tu `mvw_churn`: la misma medida gobernada que definiste en el Ej. 3, ahora convertida en gráfico
+## 🧠 Conceptos de Databricks de este módulo
+
+| Concepto | Qué es |
+|----------|--------|
+| **AI/BI Dashboard** | Los dashboards de Databricks: gráficos interactivos sobre tus datos, que se comparten con un enlace |
+| **Dataset** | La consulta (o metric view) que alimenta los gráficos del dashboard |
+| **Widget / visualización** | Cada elemento del panel: un KPI, un gráfico de barras, un mapa, un filtro, una imagen |
+| **Genie Code en dashboards** | El asistente de IA que construye el dashboard por ti: crea datasets, gráficos, filtros y el diseño a partir de tu descripción |
+| **Draft / Publish** | Mientras editas, el dashboard está en **borrador**. Al **publicarlo**, los demás ven la versión final y solo interactúan con los filtros |
+
+## ✅ Antes de empezar
+- Completaste el [Ej. 1](../01%20-%20SQL%20con%20IA) y el [Ej. 3](../03%20-%20M%C3%A9tricas%20de%20Negocio) (tienes `mvw_churn` en tu schema)
 
 ---
 
 ## Paso 1: Crear el dashboard
-1. En el menú lateral izquierdo, haz clic en **Dashboards**
-2. Haz clic en **Create Dashboard**
+1. En el **menú lateral izquierdo**, haz clic en **Dashboards**
+2. Haz clic en **Create dashboard** (arriba a la derecha)
+3. Se abre un dashboard en blanco, en modo borrador. Si te pide un warehouse, elige **`fromzerotohero_workshop_wh`**
 
-## Paso 2: Generar los análisis con Genie (sobre tu metric view)
-Justo después de crear el dashboard, pega este prompt en el espacio de texto debajo de **Create a dashboard with Genie**, reemplazando `<tu_schema>` por el nombre de tu schema:
+## Paso 2: Pedirle los gráficos a Genie Code
+1. Abre el panel de **Genie Code** del dashboard (botón **Genie Code** arriba a la derecha, o el cuadro de texto que aparece en el dashboard en blanco para describir lo que quieres)
+2. Pega este prompt, reemplazando `<tu_schema>` por tu schema, y presiona **Enter**:
 ```text
-Usando la metric view mvw_churn de dbacademy.<tu_schema>, crea análisis de churn: un indicador (KPI) con la Tasa de Churn general; un gráfico de barras con la Tasa de Churn por Plan, de mayor a menor; un gráfico de barras con la Tasa de Churn por Segmento; y un gráfico de línea con las Cancelaciones por Mes.
+Usando la metric view mvw_churn de fromzerotohero.<tu_schema>, crea análisis de churn: un indicador (KPI) con la Tasa de Churn general; un gráfico de barras con la Tasa de Churn por Plan, de mayor a menor; un gráfico de barras con la Tasa de Churn por Segmento; y un gráfico de línea con las Cancelaciones por Mes.
 ```
+3. Genie Code va mostrando lo que hace (busca los datos, crea el dataset, arma cada gráfico). Si te pide confirmar un paso, lee y acepta
 
-Resultado esperado: 4 gráficos en el dashboard:
+✅ **Checkpoint:** 4 gráficos en el dashboard:
 - Un KPI con la Tasa de Churn general
 - Barras con la Tasa de Churn por Plan
 - Barras con la Tasa de Churn por Segmento
-- Una línea con las Cancelaciones por Mes: serie mensual (2023–2025) con ~12 a 21 cancelaciones/mes
+- Una línea con las Cancelaciones por Mes: serie mensual (2023–2025) con entre **11 y 30** cancelaciones por mes
 
-> Fíjate: armaste 4 gráficos sin escribir una sola línea de SQL, usando la medida gobernada que ya habías creado en el Ej. 3. Es la fuente única de la verdad convertida en panel.
+> 💡 **¿Por qué usar la metric view?** Porque los gráficos usan la **misma fórmula oficial** que definiste en el Ej. 3. Si mañana alguien pregunta "¿cómo se calcula este número?", la respuesta está en un solo lugar.
 
 ### Paso 2.1: 🕵️ ¿Notaste el error? Corrígelo y mira cómo se propaga
-Revisa tu dashboard: el KPI de churn marca **100%**, pero a lo largo de la guía el churn aparece como **~27%**. El número no cuadra, y descubrir por qué es el desafío. 😉
+Mira el KPI: la tasa de churn marca **100%**. Pero en el Ej. 1 calculaste **27%** (540 cancelaciones de 2.000). El número no cuadra… y descubrir por qué es el desafío. 😉
 
-1. En el menú lateral izquierdo, ve a **Catalog → `dbacademy` → `<tu_schema>` → Tables → `mvw_churn`**
-2. Justo arriba, haz clic en el botón **Edit**
-3. Selecciona la measure llamada **`Tasa de Churn`**
-4. Corrige la **Expresión** cambiando `COUNT` por `SUM` en el numerador, de:
+1. En el menú lateral izquierdo, ve a **Catalog → `fromzerotohero` → `<tu_schema>`** y haz clic en **`mvw_churn`**
+2. Haz clic en **Edit** (arriba a la derecha)
+3. Busca la medida (measure) **`Tasa de Churn`**
+4. En su **expresión**, cambia `COUNT` por `SUM` en el numerador, de:
     ```
     COUNT(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
     ```
@@ -56,65 +63,67 @@ Revisa tu dashboard: el KPI de churn marca **100%**, pero a lo largo de la guía
     SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
     ```
 5. Haz clic en **Save**
-6. Vuelve al dashboard y haz clic en el botón de **refresh**
+6. Vuelve al dashboard y haz clic en **Refresh** (ícono de flecha circular, arriba)
 
-El KPI y los gráficos de churn bajan de 100% a la tasa real:
+<details markdown="1">
+<summary>🧯 ¿No encuentras el botón Edit? Corrígelo con SQL</summary>
+
+En el **SQL Editor**, ejecuta la definición correcta de `mvw_churn` que está en [`metric_views.sql`](../03%20-%20M%C3%A9tricas%20de%20Negocio/metric_views.sql) (la primera sentencia `CREATE OR REPLACE VIEW … mvw_churn`), reemplazando `<tu_schema>` por tu schema. Ya trae el `SUM`.
+
+</details>
+
+✅ **Checkpoint:** el KPI y los gráficos bajan de 100% a la tasa real:
 
 | | KPI | Básico | Estándar | Premium | Empresarial |
 |---|---|---|---|---|---|
 | **Antes (COUNT, incorrecto)** | 1,00 | 1,00 | 1,00 | 1,00 | 1,00 |
 | **Después (SUM, correcto)** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
 
-La causa estaba en la medida `Tasa de Churn`: `COUNT(churn_flag)` cuenta **todas** las filas (todo cliente tiene la flag, 0 o 1), mientras que `SUM(churn_flag)` suma solo las **cancelaciones** (flag = 1). Solo el `SUM` da la tasa de churn real.
+**Por segmento:** Consumidor **30,3%** · PyME **23,9%** · Corporativo **16,6%**. Cuanto más barato el plan, mayor el churn.
 
-Resultados esperados después de la corrección:
-
-**KPI Tasa de Churn:** ≈ **27%** (540 cancelaciones en 2.000 clientes)
-
-**Por plan:**
-- Básico **31,7%**
-- Estándar **27,4%**
-- Premium **22,5%**
-- Empresarial **15,7%**
-
-**Por segmento:**
-- Consumidor **30,3%**
-- PyME **23,9%**
-- Corporativo **16,6%**
-
-Cuanto más barato el plan, mayor el churn.
-
-Esa es la gran ventaja de una metric view: cambias la regla una sola vez y todos los gráficos que la usan cambian juntos.
+> 💡 **¿Qué pasó?** `COUNT(churn_flag)` cuenta **todas** las filas (todo cliente tiene la flag, 0 o 1), mientras que `SUM(churn_flag)` suma solo las **cancelaciones** (flag = 1). Y la gran ventaja de una metric view: corriges la regla **una vez** y **todos** los gráficos (y los agentes) que la usan se corrigen juntos.
 
 ### Paso 2.2: Agregar 2 filtros
-En el mismo asistente de Genie, pega el prompt de abajo:
+En el mismo panel de Genie Code, pega:
 ```text
 Agrega 2 filtros al dashboard: uno para Plan y otro para Segmento.
 ```
-
-Al elegir un valor en cualquier filtro, los gráficos se ajustan juntos.
+✅ **Checkpoint:** al elegir un valor en cualquier filtro, los gráficos se ajustan juntos.
 
 ## Paso 3: Incluir el logo
-1. Desde el menú inferior del panel, agrega un widget de **Image**
-2. Haz clic en **use a URL** y pega lo siguiente:
+1. En la barra de herramientas del dashboard (abajo o arriba del lienzo), agrega un widget de **Image**
+2. Elige la opción de imagen por **URL** y pega:
 ```text
-https://raw.githubusercontent.com/carolina-carneiro_data/Databricks-Master-Training-ES/main/assets/logo_master_training.png
+https://raw.githubusercontent.com/carolinaacarneiro/from-zero-to-hero-business/main/assets/logo_fzth.png
 ```
-3. Posiciona el logo en la parte superior del dashboard, ocupando todo el ancho de la página
+3. Arrastra el logo a la parte superior del dashboard y estíralo para que ocupe todo el ancho
 
-## Paso 4: Mapa de churn por región (con Genie)
-1. Selecciona **Genie** nuevamente
-2. Pega el prompt de abajo:
+> Si tu workspace no permite imágenes por URL, descarga el archivo `assets/logo_fzth.png` del repositorio y súbelo en el widget de imagen.
+
+## Paso 4: Mapa de churn por país (con Genie Code)
+Pega en Genie Code:
 ```text
-Incluye un mapa con la cantidad de suscripciones canceladas por país. Usa la columna pais (código ISO de 2 letras) de dbacademy.churn.dim_cliente y las tablas dbacademy.churn.hecho_suscripcion y dbacademy.churn.dim_cliente.
+Incluye un mapa con la cantidad de suscripciones canceladas por país. Usa la columna pais (código ISO de 2 letras) de fromzerotohero.churn.dim_cliente y las tablas fromzerotohero.churn.hecho_suscripcion y fromzerotohero.churn.dim_cliente.
 ```
-
-Resultado esperado: un mapa de LATAM con las cancelaciones distribuidas entre ~8 países, con mayor concentración en **MX, AR, CO y PE**.
+✅ **Checkpoint:** un mapa de LATAM con las cancelaciones en 8 países, con mayor concentración en **MX (163), AR (66), CO (57) y PE (56)**.
 
 ## Paso 5: Nombrar y publicar
-1. Haz clic en el título del dashboard, en la parte superior de la página, y renómbralo como **`Análisis de Churn <tu_schema>`**, reemplazando `<tu_schema>` por el nombre de tu schema
-2. Haz clic en **Publish** en la esquina superior derecha
+1. Haz clic en el **título** del dashboard (arriba a la izquierda) y renómbralo como **`Análisis de Churn <tu_schema>`**
+2. Haz clic en **Publish** (arriba a la derecha) y confirma
 
-El dashboard publicado es el que compartes con el equipo de negocio: ellos interactúan con los filtros sin necesitar el editor.
+> 💡 **¿Por qué publicar?** El dashboard publicado es el que compartes con el equipo de negocio: ellos interactúan con los filtros sin poder cambiar (ni romper) el diseño. Tú sigues editando el borrador y vuelves a publicar cuando quieras.
 
-> Volveremos a este panel en el Ej. 6
+> Volveremos a este dashboard en el Ej. 6 para agregarle la **predicción** de churn.
+
+## 🧯 Si algo sale mal
+| Síntoma | Qué hacer |
+|---------|-----------|
+| Genie Code no encuentra `mvw_churn` | Escribe la dirección completa `fromzerotohero.<tu_schema>.mvw_churn` en el prompt, o agrégala como dataset con **Data → Add data source** |
+| Genie Code armó otro tipo de gráfico | Pídele el cambio: *"cambia el gráfico de segmentos a barras horizontales"* |
+| El KPI no cambió después de corregir la medida | Haz clic en **Refresh** en el dashboard |
+| No aparece la opción **Publish** | Revisa que estés en el borrador (Draft) del dashboard |
+
+## 📌 Lo que aprendiste
+- Un **AI/BI Dashboard** se puede construir describiendo lo que quieres a **Genie Code**
+- Usar la **metric view** hace que todos los gráficos compartan la misma fórmula
+- Corregir la métrica en un solo lugar corrige todo

@@ -1,21 +1,32 @@
-# 08 - Retención con ML y GenAI
+# 08 · Retención con ML y GenAI
 
-![Ruta del Master Training con énfasis en lo construido hasta el Ejercicio 08](../assets/08%20-%20arquitetura.gif?v=20260928)
+![Ruta From Zero to Hero con énfasis en lo construido hasta el Ejercicio 08](../assets/arquitectura_08.svg)
 
 > _Resaltado, lo que ya construiste en la ruta hasta este punto; en gris, lo que todavía viene._
 
-Hasta aquí **detectaste** quién está en riesgo (dashboards + modelo del Ej. 6) y **diagnosticaste** el porqué (IA + agentes). Ahora vamos a **actuar**: vamos a crear las funciones que, a partir de un `id_cliente`, arman la oferta de retención adecuada y generan un e-mail de marketing personalizado. Y vamos a crearlas conversando con el **Genie Code**, sin escribir SQL a mano.
+**⏱️ Tiempo:** 35 min · **📍 Dónde:** SQL Editor + Genie Code · **🧰 Lo que usas:** UC Functions, `ai_query`, Genie Code
 
-El gran truco de este módulo: las reglas de negocio quedan **gobernadas en Unity Catalog** (reutilizables por la app del Ej. 9, por el Genie y por cualquier agente) y la **IA solo escribe el texto**, sin decidir la oferta.
+Hasta aquí **detectaste** quién está en riesgo (dashboards + modelo del Ej. 6) y **diagnosticaste** el porqué (IA + agentes). Ahora vas a **actuar**: crear las funciones que, a partir de un `id_cliente`, arman la **oferta de retención** adecuada y escriben un **e-mail personalizado**. Y las vas a crear **conversando con Genie Code**, sin escribir SQL a mano.
 
-**Requisitos previos:**
-- [Ej. 1 - SQL con IA](../01%20-%20SQL%20con%20IA)
-- [Ej. 6 - Predicción de Churn (ML)](../06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29)
+El gran truco de este módulo: las **reglas de negocio** quedan **gobernadas en Unity Catalog** (reutilizables por la app del Ej. 9, por los agentes y por cualquier herramienta) y la **IA solo escribe el texto**: nunca decide la oferta.
 
-## Objetivo
-Crear dos UC Functions en tu schema `dbacademy.<tu_schema>`, una a la vez, usando el **Genie Code**:
-- **`get_cliente_360(id)`**: pasas el id del cliente, recibes su perfil (registro + riesgo) **y las ofertas de retención ya calculadas por las reglas de negocio**
-- **`generar_email_retencion(id)`**: pasas el id, recibes el e-mail de retención listo, con la oferta correcta aplicada
+## 🎯 Al terminar vas a…
+- Tener en tu schema la función **`get_cliente_360(id)`**: perfil del cliente + riesgo + ofertas calculadas por las reglas
+- Tener la función **`generar_email_retencion(id)`**: el e-mail de retención listo, con la oferta correcta
+
+## 🧠 Conceptos de Databricks de este módulo
+
+| Concepto | Qué es |
+|----------|--------|
+| **UC Function (función de Unity Catalog)** | Una función SQL guardada en tu schema, con nombre, dueño y permisos. Recibe parámetros (aquí, el id del cliente) y devuelve un resultado. Se reutiliza desde SQL, dashboards, agentes y apps |
+| **Función de tabla** | Una función que devuelve **filas** (como una tabla). Se usa en el `FROM`: `SELECT * FROM get_cliente_360('C01575')` |
+| **`CASE WHEN`** | La forma de escribir reglas en SQL: *"si pasa esto, entonces aquello; si no, otra cosa"* |
+| **`ai_query`** | La AI Function que ya usaste en el Ej. 4: aquí redacta el e-mail a partir de las ofertas ya decididas |
+| **Permiso `EXECUTE`** | El permiso para usar una función. Quien no lo tiene, no puede ejecutarla |
+
+## ✅ Antes de empezar
+- Completaste el [Ej. 1](../01%20-%20SQL%20con%20IA) y el [Ej. 6](../06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29) (tienes `churn_scores` en tu schema)
+- Abre el **SQL Editor** con el warehouse **`fromzerotohero_workshop_wh`**
 
 ---
 
@@ -36,22 +47,23 @@ Las ofertas salen de tres reglas de negocio. Usan solo datos que ya tenemos, inc
 La antigüedad como cliente se mide contra la **fecha de referencia de la base**, `DATE '2026-09-23'` (y no contra la fecha de hoy), para que el resultado sea el mismo para todo el grupo en cualquier día.
 
 ## Paso 2: Crear la `get_cliente_360` (del id al perfil + ofertas)
-1. En el menú lateral izquierdo, selecciona **SQL Editor**
-2. Deberías llegar al editor con una query; si no, crea una con **SQL Query** debajo de **Create new**
-3. Abre el Genie Code haciendo clic en el ícono de bombilla en la esquina superior derecha
-4. Pega el prompt de abajo, reemplazando `<tu_schema>` por el nombre de tu schema:
+1. En el menú lateral izquierdo, selecciona **SQL Editor** (si no se abre una consulta en blanco: **Create new → SQL Query**)
+2. Arriba a la derecha, haz clic en el botón de **Genie Code**: se abre el panel a la derecha
+3. Copia el prompt de abajo, reemplaza `<tu_schema>` por tu schema y pégalo en Genie Code:
 ```text
-Crea una UC Function (función SQL de tabla) llamada get_cliente_360(p_id STRING) en el schema dbacademy.<tu_schema>. Une las tablas dbacademy.churn.dim_cliente y dbacademy.<tu_schema>.churn_scores por id_cliente y devuelve, para el cliente cuyo id_cliente = p_id: nombre_cliente, ciudad, pais, segmento, canal_adquisicion, fecha_registro (de dim_cliente) y nombre_plan, precio_mensual, prob_churn, nivel_riesgo, factor_principal (de churn_scores). Agrega cuatro columnas calculadas en SQL, midiendo la antigüedad como cliente con datediff entre la fecha de referencia DATE '2026-09-23' y fecha_registro: anios_como_cliente (entero); descuento = '15%' si tiene 5 años o más como cliente, si no '10%'; oferta_internet = '10 GB de internet gratis' si nombre_plan = 'Básico', si no 'el doble de tu internet actual + WhatsApp ilimitado'; oferta_factor según factor_principal: 'Insatisfacción (CSAT)' -> 'un gerente de cuenta dedicado', 'Morosidad' -> 'renegociación de tu factura sin intereses', 'Bajo uso' -> 'una sesión gratuita de capacitación', en otro caso -> 'una llamada con un especialista'.
+Crea una UC Function (función SQL de tabla) llamada get_cliente_360(p_id STRING) en el schema fromzerotohero.<tu_schema>. Une las tablas fromzerotohero.churn.dim_cliente y fromzerotohero.<tu_schema>.churn_scores por id_cliente y devuelve, para el cliente cuyo id_cliente = p_id: nombre_cliente, ciudad, pais, segmento, canal_adquisicion, fecha_registro (de dim_cliente) y nombre_plan, precio_mensual, prob_churn, nivel_riesgo, factor_principal (de churn_scores). Agrega cuatro columnas calculadas en SQL, midiendo la antigüedad como cliente con datediff entre la fecha de referencia DATE '2026-09-23' y fecha_registro: anios_como_cliente (entero); descuento = '15%' si tiene 5 años o más como cliente, si no '10%'; oferta_internet = '10 GB de internet gratis' si nombre_plan = 'Básico', si no 'el doble de tu internet actual + WhatsApp ilimitado'; oferta_factor según factor_principal: 'Insatisfacción (CSAT)' -> 'un gerente de cuenta dedicado', 'Morosidad' -> 'renegociación de tu factura sin intereses', 'Bajo uso' -> 'una sesión gratuita de capacitación', en otro caso -> 'una llamada con un especialista'.
 ```
-5. Revisa el `CREATE FUNCTION` generado y haz clic en **Run**
+4. Revisa el `CREATE FUNCTION` generado, llévalo al editor y haz clic en **Run**
 
-<details>
+✅ **Checkpoint:** el resultado dice `OK`, y en **Catalog → `fromzerotohero` → `<tu_schema>` → Functions** aparece `get_cliente_360`.
+
+<details markdown="1">
 <summary>👉 Resultado esperado:</summary>
 
 > Reemplaza `<tu_schema>` por el nombre de tu schema antes de ejecutar
 
 ```sql
-CREATE OR REPLACE FUNCTION dbacademy.<tu_schema>.get_cliente_360(p_id STRING)
+CREATE OR REPLACE FUNCTION fromzerotohero.<tu_schema>.get_cliente_360(p_id STRING)
 RETURNS TABLE (nombre_cliente STRING, ciudad STRING, pais STRING, segmento STRING,
   canal_adquisicion STRING, fecha_registro DATE, nombre_plan STRING, precio_mensual DOUBLE,
   prob_churn DOUBLE, nivel_riesgo STRING, factor_principal STRING,
@@ -67,8 +79,8 @@ RETURN
               WHEN s.factor_principal = 'Morosidad' THEN 'renegociación de tu factura sin intereses'
               WHEN s.factor_principal = 'Bajo uso' THEN 'una sesión gratuita de capacitación'
               ELSE 'una llamada con un especialista' END AS oferta_factor
-  FROM dbacademy.churn.dim_cliente c
-  JOIN dbacademy.<tu_schema>.churn_scores s ON c.id_cliente = s.id_cliente
+  FROM fromzerotohero.churn.dim_cliente c
+  JOIN fromzerotohero.<tu_schema>.churn_scores s ON c.id_cliente = s.id_cliente
   WHERE c.id_cliente = p_id;
 ```
 
@@ -77,12 +89,12 @@ RETURN
 Prueba la función con dos clientes, uno a cada lado de las reglas:
 ```sql
 SELECT nombre_cliente, nombre_plan, anios_como_cliente, descuento, oferta_internet, oferta_factor
-FROM dbacademy.<tu_schema>.get_cliente_360('C01575')
+FROM fromzerotohero.<tu_schema>.get_cliente_360('C01575')
 UNION ALL
 SELECT nombre_cliente, nombre_plan, anios_como_cliente, descuento, oferta_internet, oferta_factor
-FROM dbacademy.<tu_schema>.get_cliente_360('C00018');
+FROM fromzerotohero.<tu_schema>.get_cliente_360('C00018');
 ```
-Resultado esperado:
+✅ **Checkpoint:**
 
 | nombre | plan | años como cliente | descuento | internet | acción |
 |--------|------|:---:|:---:|----------|--------|
@@ -97,17 +109,17 @@ Una función se convierte en un activo gobernado de Unity Catalog: la app queda 
 ## Paso 3: Crear la `generar_email_retencion` (del perfil al e-mail)
 1. De vuelta en el Genie Code, pega el prompt de abajo, reemplazando `<tu_schema>` por el nombre de tu schema:
 ```text
-Crea una UC Function (función SQL de tabla) llamada generar_email_retencion(p_id STRING) en el schema dbacademy.<tu_schema>, usando las tablas dbacademy.churn.dim_cliente y dbacademy.<tu_schema>.churn_scores unidas por id_cliente. Devuelve una columna email con un e-mail de retención personalizado en español para el cliente cuyo id_cliente = p_id. Mide la antigüedad como cliente con datediff entre la fecha de referencia de la base DATE '2026-09-23' y fecha_registro (usa esa fecha fija, no la fecha actual, para que el resultado sea estable). Calcula en SQL con CASE tres ofertas y luego usa ai_query('databricks-meta-llama-3-3-70b-instruct', ...) para redactar el e-mail citando nombre, ciudad y años como cliente, ofreciendo exactamente: (a) descuento de 15% si el cliente tiene 5 años o más como cliente, si no 10%; (b) si nombre_plan = 'Básico' entonces 10 GB de internet gratis, si no el doble de internet + WhatsApp ilimitado; (c) según factor_principal: 'Insatisfacción (CSAT)' -> gerente de cuenta dedicado, 'Morosidad' -> renegociación de la factura sin intereses, 'Bajo uso' -> sesión gratuita de capacitación, en otro caso -> llamada con un especialista.
+Crea una UC Function (función SQL de tabla) llamada generar_email_retencion(p_id STRING) en el schema fromzerotohero.<tu_schema>, usando las tablas fromzerotohero.churn.dim_cliente y fromzerotohero.<tu_schema>.churn_scores unidas por id_cliente. Devuelve una columna email con un e-mail de retención personalizado en español para el cliente cuyo id_cliente = p_id. Mide la antigüedad como cliente con datediff entre la fecha de referencia de la base DATE '2026-09-23' y fecha_registro (usa esa fecha fija, no la fecha actual, para que el resultado sea estable). Calcula en SQL con CASE tres ofertas y luego usa ai_query('databricks-meta-llama-3-3-70b-instruct', ...) para redactar el e-mail citando nombre, ciudad y años como cliente, ofreciendo exactamente: (a) descuento de 15% si el cliente tiene 5 años o más como cliente, si no 10%; (b) si nombre_plan = 'Básico' entonces 10 GB de internet gratis, si no el doble de internet + WhatsApp ilimitado; (c) según factor_principal: 'Insatisfacción (CSAT)' -> gerente de cuenta dedicado, 'Morosidad' -> renegociación de la factura sin intereses, 'Bajo uso' -> sesión gratuita de capacitación, en otro caso -> llamada con un especialista.
 ```
-2. Revisa el `CREATE FUNCTION` generado y haz clic en **Run**
+2. Revisa el `CREATE FUNCTION` generado, llévalo al editor y haz clic en **Run**
 
-<details>
+<details markdown="1">
 <summary>👉 Resultado esperado:</summary>
 
 > Reemplaza `<tu_schema>` por el nombre de tu schema antes de ejecutar
 
 ```sql
-CREATE OR REPLACE FUNCTION dbacademy.<tu_schema>.generar_email_retencion(p_id STRING)
+CREATE OR REPLACE FUNCTION fromzerotohero.<tu_schema>.generar_email_retencion(p_id STRING)
 RETURNS TABLE (email STRING)
 RETURN
     WITH datos AS (
@@ -126,8 +138,8 @@ RETURN
                  WHEN cs.factor_principal = 'Morosidad' THEN 'renegociación de tu factura sin intereses'
                  WHEN cs.factor_principal = 'Bajo uso' THEN 'una sesión gratuita de capacitación'
                  ELSE 'una llamada con un especialista' END AS oferta_factor
-        FROM dbacademy.churn.dim_cliente dc
-        JOIN dbacademy.<tu_schema>.churn_scores cs ON dc.id_cliente = cs.id_cliente
+        FROM fromzerotohero.churn.dim_cliente dc
+        JOIN fromzerotohero.<tu_schema>.churn_scores cs ON dc.id_cliente = cs.id_cliente
         WHERE dc.id_cliente = p_id
     )
     SELECT
@@ -153,9 +165,9 @@ Prueba con Mariana (5 años · Básico · Insatisfacción):
 ```sql
 SELECT
     email
-FROM dbacademy.<tu_schema>.generar_email_retencion('C01575');
+FROM fromzerotohero.<tu_schema>.generar_email_retencion('C01575');
 ```
-Resultado esperado:
+✅ **Checkpoint (ejemplo; el texto exacto cambia porque lo escribe la IA):**
 > *"Hola Mariana López… es un gusto tenerte con nosotros desde hace **5 años**… en **Lima**… un **descuento de 15%** en tu factura… **10 GB de internet gratis**… un **gerente de cuenta dedicado**…"*
 
 ## Paso 4: Revisar las reglas
@@ -163,7 +175,7 @@ Prueba un cliente del otro lado de las reglas:
 ```sql
 SELECT
     email
-FROM dbacademy.<tu_schema>.generar_email_retencion('C00018');
+FROM fromzerotohero.<tu_schema>.generar_email_retencion('C00018');
 ```
 Es Gabriela Rodríguez (4 años · Empresarial · Morosidad), y el e-mail cambia solo:
 
@@ -176,5 +188,19 @@ Lee los dos e-mails lado a lado: la misma función, ofertas distintas, cada una 
 
 > **La lección:** la regla de negocio está **gobernada** (SQL, verificable, igual para todos) y la **IA se encarga solo del lenguaje**. Nunca quedas a merced de que la IA "invente" un descuento, y creaste todo esto solo describiendo lo que querías al Genie Code.
 
-## Explore
+## 🧯 Si algo sale mal
+| Síntoma | Qué hacer |
+|---------|-----------|
+| `TABLE_OR_VIEW_NOT_FOUND: churn_scores` | Ejecuta primero el notebook del Ej. 6 con **tu** schema |
+| La función devuelve 0 filas | Revisa el id: `C01575` (con C mayúscula y 5 dígitos) |
+| Genie Code creó la función con otro nombre o columnas | Usa el SQL de **Resultado esperado** (reemplazando `<tu_schema>`): la app del Ej. 9 necesita exactamente `get_cliente_360` con esas columnas |
+| `ai_query` falla con el modelo Llama | Cambia el modelo por `databricks-gpt-oss-120b` en la función |
+| El e-mail menciona "telecom" u otro sector | Agrega al prompt: *"empresa de suscripción genérica, no menciones el sector"* |
+
+## 📌 Lo que aprendiste
+- Una **UC Function** convierte una regla de negocio en un activo gobernado y reutilizable
+- La regla decide la oferta (SQL, verificable); la IA solo escribe el texto
+- Con **Genie Code** creaste funciones complejas describiendo lo que querías
+
+## 🔜 Lo que viene
 Acabas de construir el motor de acción de la retención: dado un cliente en riesgo, salen la oferta correcta y el e-mail listo, con la regla de negocio gobernada y la IA solo en la redacción. En el próximo módulo (Ej. 9 - Creación de Apps), la app **Central de Retención** va a llamar a la `get_cliente_360`: el agente de atención escribe el id, ve el perfil y el riesgo, y hace clic para generar el e-mail. Ahí, quien redacta el texto es un modelo gobernado por Unity Gateway, que vas a crear en tu schema, a partir de las mismas ofertas calculadas aquí.

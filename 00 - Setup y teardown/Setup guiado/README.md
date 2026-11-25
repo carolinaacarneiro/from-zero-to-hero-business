@@ -4,7 +4,7 @@ search:
 ---
 # Setup guiado
 
-Tres videos cortos para los **líderes de datos** de las empresas participantes del Master Training: la dinámica del entrenamiento, cómo preparar el entorno de Databricks del equipo y cómo enviar las evidencias al final.
+Tres videos cortos para los **líderes de datos** de las empresas participantes del From Zero to Hero: la dinámica del entrenamiento, cómo preparar el entorno de Databricks del equipo y cómo enviar las evidencias al final.
 
 !!! info "Página no listada"
     Contenido dirigido a los líderes de datos. A propósito, **no aparece en el menú ni en la búsqueda**: comparte el enlace solo con quien lo necesite.
