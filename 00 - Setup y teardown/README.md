@@ -17,7 +17,7 @@ Esta página es para **dos personas**:
 > 📽️ **Material de apoyo:** [guía del administrador](../presentacion/guia_admin.html) (cronograma de preparación en una página) · [presentación del instructor](../presentacion/deck_instructor.html) (← → para navegar, **N** para las notas).
 
 !!! tip "Líderes de datos: mira el Setup guiado"
-    Videos cortos sobre la dinámica del entrenamiento, la preparación del entorno y el envío de evidencias: **[Setup guiado](<Setup guiado/README.md>)**.
+    Presentación animada sobre la dinámica del entrenamiento, la preparación del entorno y el envío de evidencias: **[Setup guiado](<Setup guiado/README.md>)**.
 
 ---
 
