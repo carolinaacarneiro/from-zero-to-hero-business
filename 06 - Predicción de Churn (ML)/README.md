@@ -38,7 +38,7 @@ Hasta aquí miraste el churn que **ya pasó**. Ahora vas a **anticiparte**: entr
     > ¿No tienes el Git folder? **Workspace → ⋮ → Import → URL** y pega
     > `https://raw.githubusercontent.com/carolinaacarneiro/from-zero-to-hero-business/main/06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29/notebook_modelo_churn.py`
 3. Arriba a la derecha, haz clic en **Connect** y elige **`fromzerotohero_workshop_cluster`**
-4. Ejecuta las celdas en orden (**Shift + Enter**) hasta la celda de código debajo de **Paso 1 — Configura tu schema**: aparece el campo **Tu schema**
+4. Ejecuta las celdas en orden (**Shift + Enter**) hasta la celda de código debajo de **Paso 1 — Configura tu schema**: aparece el campo **Tu schema** (arriba del notebook o en el panel lateral **Parameters**)
     > La primera celda instala bibliotecas y **reinicia Python**: es normal que tarde unos segundos
 5. **Escribe** tu schema en el campo **Tu schema** (ej.: `ggarcia`)
 6. Haz clic en **Run all**

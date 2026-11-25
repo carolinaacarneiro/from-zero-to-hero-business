@@ -19,7 +19,7 @@
 |----------|--------|
 | **Notebook** | Una página con **celdas** de texto y de código. Ejecutas cada celda (o todas con **Run all**) |
 | **Cluster** | El cómputo que ejecuta el notebook. Usamos `fromzerotohero_workshop_cluster`, creado por tu administrador |
-| **Widget** | Un campo arriba del notebook para escribir un valor (aquí, tu schema) sin tocar el código |
+| **Widget** | Un campo (arriba del notebook o en el panel **Parameters**) para escribir un valor (aquí, tu schema) sin tocar el código |
 | **Metric View** | Una view de Unity Catalog que guarda la **definición oficial** de las métricas: **dimensiones** (por dónde cortar) y **medidas** (qué calcular) |
 | **`MEASURE()`** | La función SQL para pedir una medida por su nombre: `MEASURE(\`Morosidad\`)` |
 
@@ -37,7 +37,7 @@
     > `https://raw.githubusercontent.com/carolinaacarneiro/from-zero-to-hero-business/main/03%20-%20M%C3%A9tricas%20de%20Negocio/notebook_metric_views.py`
 3. Arriba a la derecha, haz clic en **Connect** y elige el cluster **`fromzerotohero_workshop_cluster`**
     > Si el cluster está apagado, Databricks lo enciende solo: puede tardar de 3 a 5 minutos la primera vez
-4. Haz clic dentro de la **primera celda de código** y presiona **Shift + Enter**. Aparece el campo **Tu schema** arriba del notebook
+4. Haz clic dentro de la **primera celda de código** y presiona **Shift + Enter**. Aparece el campo **Tu schema** (arriba del notebook o en el panel lateral **Parameters**)
 5. En **Tu schema**, **escribe** tu schema (ej.: `ggarcia`)
 6. Haz clic en **Run all** (arriba a la derecha)
 

@@ -32,7 +32,7 @@
 # MAGIC
 # MAGIC ### ▶️ Cómo ejecutarlo
 # MAGIC 1. Conecta el notebook a un cómputo **Serverless** (botón **Connect**, arriba a la derecha).
-# MAGIC 2. Ejecuta las **dos primeras celdas de código** (Shift + Enter en cada una): aparecen los campos arriba.
+# MAGIC 2. Ejecuta las **dos primeras celdas de código** (Shift + Enter en cada una): aparecen los campos (arriba del notebook o en el panel lateral **Parameters**).
 # MAGIC 3. En **4. Participantes**, marca a todas las personas del entrenamiento. No cambies los demás campos.
 # MAGIC 4. Haz clic en **Run all**. Al final, la sección **7. Informe final** dice
 # MAGIC    `✅ VERIFICACIONES COMPLETAS` o qué corregir.

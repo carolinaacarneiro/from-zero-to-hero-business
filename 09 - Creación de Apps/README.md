@@ -45,7 +45,7 @@ La publicas ejecutando **un único notebook**: escribes tu schema y haces clic e
 2. Abre tu **Git folder** del curso → carpeta **`09 - Creación de Apps`** → notebook **`deploy_app`**
     > Usa el Git folder: el notebook toma el código de la app de la carpeta `app/` que está al lado
 3. Arriba a la derecha, haz clic en **Connect** y elige **`fromzerotohero_workshop_cluster`**
-4. Ejecuta la **primera celda de código**, debajo de **Paso 1 — Completa los campos** (Shift + Enter): aparecen los campos arriba
+4. Ejecuta la **primera celda de código**, debajo de **Paso 1 — Completa los campos** (Shift + Enter): aparecen los campos (arriba del notebook o en el panel lateral **Parameters**)
 5. En **1. Tu schema**, **escribe** tu schema (ej.: `ggarcia`). Deja los demás campos como están:
     - **2. Warehouse**: `fromzerotohero_workshop_wh`
     - **3. Model service**: `retencion-gateway`

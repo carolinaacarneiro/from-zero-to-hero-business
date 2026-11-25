@@ -82,7 +82,7 @@ Esta página es para **dos personas**:
 **Paso 2: Abrir y ejecutar el Setup**
 1. Dentro del Git folder, abre **`00 - Setup y teardown` → `notebooks` → `00_setup`**
 2. Arriba a la derecha, haz clic en **Connect** y elige **Serverless**
-3. Ejecuta las **dos primeras celdas de código**: haz clic dentro de cada una y presiona **Shift + Enter**. Aparecen unos campos (widgets) arriba del notebook
+3. Ejecuta las **dos primeras celdas de código**: haz clic dentro de cada una y presiona **Shift + Enter**. Aparecen unos campos (widgets) (arriba del notebook o en el panel lateral **Parameters**)
 4. En el campo **4. Participantes**, marca a todas las personas del entrenamiento (si el workspace tiene más de 1.024 usuarios, el campo es de texto: escribe los e-mails separados por coma). No cambies los demás campos, salvo **1b. Ubicación gestionada** si tu administrador de la nube te indicó una ruta de almacenamiento
 5. Haz clic en **Run all** (arriba a la derecha) y espera de 5 a 10 minutos
 6. ✅ Al final, la sección **7. Informe final** debe decir **`✅ VERIFICACIONES COMPLETAS`**
@@ -113,7 +113,7 @@ Envía a cada participante el enlace de este repositorio y pídele que siga la s
 2. Si tu administrador te compartió el **Git folder** del curso, ábrelo. Si no, clónalo como en el **Paso 1** de arriba (**Workspace → Create → Git folder**)
 3. Abre **`00 - Setup y teardown` → `notebooks` → `00_verificar_ambiente`**
 4. Arriba a la derecha, haz clic en **Connect** y elige **`fromzerotohero_workshop_cluster`** (o **Serverless**)
-5. Ejecuta la celda del **Paso 0** (Shift + Enter): aparece el campo **Tu schema**
+5. Ejecuta la celda del **Paso 0** (Shift + Enter): aparece el campo **Tu schema** (arriba del notebook o en el panel lateral **Parameters**). **No eliges un schema existente: escribes el nombre del tuyo** y el notebook lo crea
 6. Escribe tu schema: **1.ª letra de tu nombre + primer apellido**, en minúsculas y sin acentos (ej.: *Gabriel García* → `ggarcia`). **Anótalo**: lo vas a usar en todos los módulos
 7. Haz clic en **Run all**
 8. ✅ Al final verás tu resultado (🟢 Listo · 🟡 Listo con avisos · 🔴 Falta algo). **Copia el bloque de resumen** y envíalo a tu administrador o instructor

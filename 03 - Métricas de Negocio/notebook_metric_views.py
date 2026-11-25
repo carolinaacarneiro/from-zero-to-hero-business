@@ -19,7 +19,7 @@
 # MAGIC
 # MAGIC ### ▶️ Cómo ejecutarlo
 # MAGIC 1. Arriba a la derecha, haz clic en **Connect** y elige `fromzerotohero_workshop_cluster`.
-# MAGIC 2. Ejecuta la celda de abajo (**Shift + Enter**): aparece el campo **Tu schema** arriba del notebook.
+# MAGIC 2. Ejecuta la celda de abajo (**Shift + Enter**): aparece el campo **Tu schema** (arriba del notebook o en el panel lateral **Parameters**).
 # MAGIC 3. Escribe tu schema (ej.: `ggarcia`) y haz clic en **Run all**.
 
 # COMMAND ----------

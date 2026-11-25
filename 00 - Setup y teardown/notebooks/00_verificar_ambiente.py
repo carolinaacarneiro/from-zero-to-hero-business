@@ -29,7 +29,8 @@
 # MAGIC    Si no aparece, elige **Serverless**.
 # MAGIC    > El **cómputo** es la "máquina" que ejecuta el código. Sin cómputo, el notebook no corre.
 # MAGIC 2. **Ejecuta la celda del Paso 0** (haz clic dentro de ella y presiona **Shift + Enter**).
-# MAGIC    Aparece un campo **Tu schema** arriba del notebook.
+# MAGIC    Aparece un campo **Tu schema** (arriba del notebook o en el panel lateral **Parameters**).
+# MAGIC    No eliges un schema existente: **escribes el nombre del tuyo** y este notebook lo crea.
 # MAGIC 3. **Escribe tu schema**: la 1.ª letra de tu nombre + tu primer apellido, en minúsculas y sin
 # MAGIC    acentos. Ejemplo: *Gabriel García* → `ggarcia`. **Anótalo**: lo vas a usar en todos los módulos.
 # MAGIC 4. Haz clic en **Run all** (arriba a la derecha) y espera. Al final aparece tu **resultado**:
