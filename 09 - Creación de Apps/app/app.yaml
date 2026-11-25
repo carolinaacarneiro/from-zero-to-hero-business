@@ -1,0 +1,33 @@
+# Central de Retención — config del Databricks App (Node.js, autenticación ON-BEHALF-OF del usuario).
+#
+# Al publicar, Databricks Apps ejecuta `npm install` (package.json de esta carpeta) y luego el comando
+# de abajo. El front-end (React) ya viene compilado en frontend/dist.
+#
+# ON-BEHALF-OF (OBO): el app usa el token del usuario logueado (encabezado x-forwarded-access-token) en
+# las llamadas de SQL, Genie e IA: los datos y la IA se usan con la identidad del USUARIO, y el service
+# principal del app no necesita ningún permiso. Los scopes (sql, genie, ai-gateway, model-serving) se
+# configuran en el APP (campo user_api_scopes), no aquí: lo hace el notebook deploy_app.py.
+#
+# Este archivo es una REFERENCIA con valores de ejemplo: deploy_app.py genera el app.yaml final con
+# los valores de cada participante.
+command:
+  - "node"
+  - "server/index.js"
+
+env:
+  - name: CR_WAREHOUSE_ID
+    value: "<id_del_warehouse>"
+  - name: CR_GENIE_FACTURACION
+    value: "<id_del_genie_de_facturacion>"
+  - name: CR_GENIE_SOPORTE
+    value: "<id_del_genie_de_soporte>"
+  - name: CR_EXPLAIN_MODEL
+    value: "databricks-claude-sonnet-4-5"
+  - name: CR_GATEWAY_MODEL
+    value: "fromzerotohero.<tu_schema>.retencion-gateway"
+  - name: CR_CATALOG
+    value: "fromzerotohero"
+  - name: CR_SCHEMA_CHURN
+    value: "churn"
+  - name: CR_SCHEMA_PERSONAL
+    value: "<tu_schema>"

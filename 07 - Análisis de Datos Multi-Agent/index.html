@@ -1,0 +1,1036 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Entrenamiento hands-on de Databricks para usuarios de negocio — Análisis de Clientes y Churn">
+      
+      
+      
+        <link rel="canonical" href="https://carolinaacarneiro.github.io/from-zero-to-hero-business/07%20-%20An%C3%A1lisis%20de%20Datos%20Multi-Agent/">
+      
+      
+        <link rel="prev" href="../06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29/">
+      
+      
+        <link rel="next" href="../08%20-%20Retenci%C3%B3n%20con%20ML%20y%20GenAI/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/databricks-symbol.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>07 - Análisis de Datos Multi-Agent - From Zero to Hero · Business Users</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#07-analisis-de-datos-con-solucion-multi-agent" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="From Zero to Hero · Business Users" class="md-header__button md-logo" aria-label="From Zero to Hero · Business Users" data-md-component="logo">
+      
+  <img src="../assets/databricks-lockup-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            From Zero to Hero · Business Users
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              07 - Análisis de Datos Multi-Agent
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/carolinaacarneiro/from-zero-to-hero-business" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="From Zero to Hero · Business Users" class="md-nav__button md-logo" aria-label="From Zero to Hero · Business Users" data-md-component="logo">
+      
+  <img src="../assets/databricks-lockup-white.svg" alt="logo">
+
+    </a>
+    From Zero to Hero · Business Users
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/carolinaacarneiro/from-zero-to-hero-business" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01%20-%20SQL%20con%20IA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 - SQL con IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02%20-%20Generaci%C3%B3n%20de%20Alertas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 - Generación de Alertas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03%20-%20M%C3%A9tricas%20de%20Negocio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 - Métricas de Negocio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04%20-%20IA%20Generativa%20en%20SQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 - IA Generativa en SQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05%20-%20Dashboards%20con%20IA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 - Dashboards con IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 - Predicción de Churn (ML)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 - Análisis de Datos Multi-Agent
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 - Análisis de Datos Multi-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#al-terminar-vas-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Al terminar vas a…
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conceptos-de-databricks-de-este-modulo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Conceptos de Databricks de este módulo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antes-de-empezar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Antes de empezar
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08%20-%20Retenci%C3%B3n%20con%20ML%20y%20GenAI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 - Retención con ML y GenAI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09%20-%20Creaci%C3%B3n%20de%20Apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 - Creación de Apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10%20-%20Cierre%20%28Pr%C3%B3ximos%20Pasos%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 - Cierre (Próximos Pasos)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#al-terminar-vas-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Al terminar vas a…
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conceptos-de-databricks-de-este-modulo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Conceptos de Databricks de este módulo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antes-de-empezar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Antes de empezar
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="07-analisis-de-datos-con-solucion-multi-agent">07 · Análisis de Datos con Solución Multi-Agent</h1>
+<p><img alt="Ruta From Zero to Hero con énfasis en lo construido hasta el Ejercicio 07" src="../assets/arquitectura_07.svg" /></p>
+<blockquote>
+<p><em>Resaltado, lo que ya construiste en la ruta hasta este punto; en gris, lo que todavía viene.</em></p>
+</blockquote>
+<p><strong>⏱️ Tiempo:</strong> 45 min · <strong>📍 Dónde:</strong> Genie Agents y Genie One · <strong>🧰 Lo que usas:</strong> Genie Agents, Instructions, Genie One</p>
+<p>Hasta aquí <strong>tú</strong> construiste los análisis. Ahora vas a abrirlos a <strong>cualquier persona del negocio</strong>: alguien escribe su pregunta en español (<em>"¿cuál es el ingreso por segmento?"</em>) y un <strong>Genie Agent</strong> escribe el SQL, lo ejecuta y responde, con tabla y gráfico, sin que nadie escriba código.</p>
+<p>Y vas un paso más allá: vas a crear <strong>dos especialistas</strong> (uno de <strong>Facturación</strong> y uno de <strong>Soporte</strong>) y usar <strong>Genie One</strong> como <strong>una sola puerta de entrada</strong>. El usuario pregunta en un único lugar y Genie One encuentra al especialista correcto. Eso es una solución <em>multi-agent</em>.</p>
+<h2 id="al-terminar-vas-a">🎯 Al terminar vas a…</h2>
+<ul>
+<li>Tener dos Genie Agents: <strong><code>Facturación - &lt;tu_schema&gt;</code></strong> y <strong><code>Soporte - &lt;tu_schema&gt;</code></strong></li>
+<li>Enseñarle a un Genie una <strong>regla del negocio</strong> (el año fiscal) con <strong>Instructions</strong></li>
+<li>Hacer preguntas en <strong>Genie One</strong> y ver cómo elige al especialista correcto</li>
+</ul>
+<h2 id="conceptos-de-databricks-de-este-modulo">🧠 Conceptos de Databricks de este módulo</h2>
+<table>
+<thead>
+<tr>
+<th>Concepto</th>
+<th>Qué es</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Genie Agent</strong></td>
+<td>Un agente de IA que responde preguntas de negocio en lenguaje natural sobre las tablas que le das. Escribe el SQL, lo ejecuta, muestra el resultado y hasta un gráfico</td>
+</tr>
+<tr>
+<td><strong>Instructions</strong></td>
+<td>Las reglas del negocio que le enseñas al Genie (ej.: <em>"el año fiscal empieza en octubre"</em>). Valen para todos los que lo usan</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Un texto corto que dice de qué sabe el Genie. Ayuda a las personas (y a Genie One) a saber cuándo usarlo</td>
+</tr>
+<tr>
+<td><strong>Genie One</strong></td>
+<td>La pantalla de Databricks para usuarios de negocio: un único lugar para preguntar. Encuentra el Genie Agent adecuado (o los datos adecuados), responde con tus permisos y <strong>cita las fuentes</strong> que usó</td>
+</tr>
+<tr>
+<td><strong>Multi-agent</strong></td>
+<td>Varios agentes especialistas detrás de una sola puerta de entrada</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong>No confundas:</strong> <strong>Genie Code</strong> (Ej. 1, 4, 5) te ayuda a <strong>construir</strong> (escribe SQL y código). Un <strong>Genie Agent</strong> <strong>responde preguntas</strong> a cualquier persona. <strong>Genie One</strong> es la <strong>puerta de entrada</strong> para el usuario de negocio.</p>
+</blockquote>
+<h2 id="antes-de-empezar">✅ Antes de empezar</h2>
+<ul>
+<li>Completaste el <a href="../01%20-%20SQL%20con%20IA">Ej. 1</a></li>
+</ul>
+<blockquote>
+<p>⚠️ <strong>Usa exactamente estos nombres:</strong> <code>Facturación - &lt;tu_schema&gt;</code> y <code>Soporte - &lt;tu_schema&gt;</code> (ej.: <code>Facturación - ggarcia</code>). La app del Ej. 9 encuentra tus Genies por el nombre.</p>
+</blockquote>
+<hr />
+<h1 id="parte-1-genie-de-facturacion">Parte 1: Genie de Facturación</h1>
+<h2 id="paso-1-crear-el-genie-agent">Paso 1: Crear el Genie Agent</h2>
+<ol>
+<li>En el <strong>menú lateral izquierdo</strong>, haz clic en <strong>Genie Agents</strong></li>
+<li>Haz clic en <strong>New</strong> (arriba a la derecha)</li>
+<li>En la ventana para elegir los datos, busca y marca estas 4 tablas (escribe el nombre en el buscador):<ul>
+<li><code>fromzerotohero.churn.dim_cliente</code></li>
+<li><code>fromzerotohero.churn.dim_plan</code></li>
+<li><code>fromzerotohero.churn.hecho_suscripcion</code></li>
+<li><code>fromzerotohero.churn.hecho_facturacion</code></li>
+</ul>
+</li>
+<li>Haz clic en <strong>Create</strong></li>
+<li>Haz clic en <strong>Configure → Settings</strong> y completa:<ul>
+<li><strong>Title:</strong> <code>Facturación - &lt;tu_schema&gt;</code> (reemplaza <code>&lt;tu_schema&gt;</code>)</li>
+<li><strong>Description:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Especialista en facturación y cobranza de Conecta+: ingresos, montos facturados, facturas pagadas y no pagadas, morosidad y días de atraso, por plan y por segmento.
+</code></pre></div></li>
+<li><strong>Default warehouse</strong> (si aparece): <code>fromzerotohero_workshop_wh</code></li>
+</ul>
+</li>
+<li>Guarda los cambios (<strong>Save</strong>)</li>
+</ol>
+<blockquote>
+<p>💡 <strong>¿Por qué no configuramos cómo se unen las tablas?</strong> Porque el Genie lee los comentarios y las claves (FK) que documentamos en Unity Catalog (lo viste en el Ej. 1) e infiere solo las relaciones.</p>
+</blockquote>
+<h2 id="paso-2-preguntar">Paso 2: Preguntar</h2>
+<p>Vuelve al chat del Genie y haz estas preguntas, una por una:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>¿Cuáles son los ingresos totales por segmento?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> Consumidor <strong>US$ 3,62 millones</strong> · PyME <strong>US$ 1,80 millones</strong> · Corporativo <strong>US$ 680 mil</strong></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>¿Cuál es el porcentaje de facturas no pagadas por plan?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> Básico <strong>7,90%</strong> · Estándar <strong>6,49%</strong> · Premium <strong>5,90%</strong> · Empresarial <strong>5,45%</strong></p>
+<blockquote>
+<p>💡 Fíjate que no dijiste de qué tabla sale el dato: el Genie lo descubrió solo. Haz clic en <strong>Show code</strong> (o <strong>Ver SQL</strong>) en la respuesta para ver el SQL que escribió. La morosidad acompaña al churn: es peor en el plan Básico.</p>
+</blockquote>
+<hr />
+<h1 id="parte-2-genie-de-soporte">Parte 2: Genie de Soporte</h1>
+<h2 id="paso-3-crear-el-genie-agent">Paso 3: Crear el Genie Agent</h2>
+<ol>
+<li><strong>Genie Agents → New</strong></li>
+<li>Marca estas 2 tablas y haz clic en <strong>Create</strong>:<ul>
+<li><code>fromzerotohero.churn.dim_cliente</code></li>
+<li><code>fromzerotohero.churn.hecho_ticket_soporte</code></li>
+</ul>
+</li>
+<li>En <strong>Configure → Settings</strong>:<ul>
+<li><strong>Title:</strong> <code>Soporte - &lt;tu_schema&gt;</code></li>
+<li><strong>Description:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Especialista en atención y satisfacción de los clientes de Conecta+: tickets de soporte, CSAT, NPS, canales de atención (chat, email, teléfono) y categorías de reclamos.
+</code></pre></div></li>
+</ul>
+</li>
+<li><strong>Save</strong></li>
+</ol>
+<h2 id="paso-4-preguntar">Paso 4: Preguntar</h2>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>¿Cuál es el CSAT promedio por categoría de ticket?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> Consulta <strong>4,08</strong> · Cobranza <strong>2,99</strong> · Técnico <strong>2,28</strong> · Cancelación <strong>2,27</strong></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>¿Cuántos tickets de soporte tenemos por canal?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> Chat <strong>447</strong> · Email <strong>407</strong> · Teléfono <strong>399</strong></p>
+<h2 id="paso-5-una-pregunta-ambigua-el-ano-fiscal">Paso 5: Una pregunta ambigua: el año fiscal</h2>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>¿Cuál es el NPS promedio del año fiscal 2024 en Costa Rica (CR)?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> el Genie responde <strong>≈ 7,3</strong>. Lee su explicación: algo como <em>"no hay una definición de año fiscal, así que lo interpreté como año calendario (ene–dic de 2024)"</em>. Asumió año fiscal = año calendario, porque nadie le dijo cuándo empieza el año fiscal de tu empresa.</p>
+<h2 id="paso-6-ensena-la-regla-y-pregunta-de-nuevo">Paso 6: Enseña la regla y pregunta de nuevo</h2>
+<ol>
+<li>Haz clic en <strong>Configure</strong> (arriba a la derecha) → pestaña <strong>Instructions</strong></li>
+<li>Pega la regla del año fiscal y guarda:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>El año fiscal (AF) de la empresa va del 1 de octubre al 30 de septiembre del año siguiente, y se identifica por el año en que comienza. Ejemplo: el AF2024 va del 01/10/2024 al 30/09/2025. Siempre que la pregunta mencione "año fiscal", usa ese período (con base en fecha_apertura), nunca el año calendario.
+</code></pre></div></li>
+<li>Vuelve al chat y haz <strong>exactamente la misma pregunta</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>¿Cuál es el NPS promedio del año fiscal 2024 en Costa Rica (CR)?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> esta vez el Genie filtra del 01/10/2024 al 30/09/2025 y responde <strong>≈ 6,5</strong>.</li>
+</ol>
+<blockquote>
+<p>💡 <strong>La lección:</strong> la misma pregunta dio dos respuestas, y la diferencia fue la regla que le diste. Es la misma idea de la métrica gobernada del Ej. 3: sin la regla explícita, la IA adivina. Las <strong>Instructions</strong> convierten el conocimiento del negocio en respuestas confiables, para todos los que usan el Genie.</p>
+</blockquote>
+<hr />
+<h1 id="parte-3-genie-one-una-sola-puerta-de-entrada-multi-agent">Parte 3: Genie One, una sola puerta de entrada (multi-agent)</h1>
+<p>Ya tienes dos especialistas. Pero una persona del negocio no debería tener que saber <em>"esto se lo pregunto al de Facturación y esto al de Soporte"</em>. Para eso está <strong>Genie One</strong>: preguntas en un solo lugar y él encuentra al especialista.</p>
+<h2 id="paso-7-abrir-genie-one">Paso 7: Abrir Genie One</h2>
+<ol>
+<li>Arriba a la derecha de la pantalla, haz clic en el <strong>selector de apps</strong> (el ícono de cuadrícula) y elige <strong>Genie One</strong>
+    &gt; También puedes abrirlo agregando <code>/one</code> a la dirección de tu workspace: <code>https://&lt;tu-workspace&gt;/one</code></li>
+<li>Se abre la pantalla de Genie One, pensada para usuarios de negocio</li>
+</ol>
+<h2 id="paso-8-preguntar-indicando-al-especialista-con">Paso 8: Preguntar indicando al especialista con <code>@</code></h2>
+<p>Genie One busca entre <strong>todo</strong> lo que tú puedes ver en el workspace. En un workspace con muchos datos y agentes (como el de tu empresa), la forma más confiable de usarlo es <strong>decirle a qué especialista preguntar</strong>, mencionándolo con <code>@</code>.</p>
+<ol>
+<li>Haz clic en <strong>New chat</strong></li>
+<li>En la caja de texto, escribe <strong><code>@</code></strong>: aparece una lista de objetos. Escribe <code>Facturación</code> y elige <strong><code>Facturación - &lt;tu_schema&gt;</code></strong></li>
+<li>
+<p>Completa la pregunta y presiona <strong>Enter</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>¿Cuál es el monto total en facturas no pagadas?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> <strong>≈ US$ 383.335</strong> (3.846 facturas abiertas). Haz clic en las <strong>citas</strong> (íconos de fuente) de la respuesta: la fuente es tu Genie <strong>Facturación - <tu_schema></strong>.</p>
+</li>
+<li>
+<p>Abre otro <strong>New chat</strong>, escribe <code>@</code>, elige <strong><code>Soporte - &lt;tu_schema&gt;</code></strong> y pregunta:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>¿Cuál es el NPS promedio del año fiscal 2024 en Costa Rica?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> <strong>≈ 6,5</strong>: Genie One usó tu Genie de Soporte <strong>con la regla del año fiscal</strong> que le enseñaste en el Paso 6.</p>
+</li>
+</ol>
+<h2 id="paso-9-preguntar-sin-y-por-que-el-contexto-importa">Paso 9: Preguntar sin <code>@</code> (y por qué el contexto importa)</h2>
+<p>Ahora pregunta <strong>sin</strong> mencionar a ningún Genie, pero dando el contexto del negocio:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>¿Cuál es la calificación promedio de NPS por canal de atención de los clientes de Conecta+?
+</code></pre></div>
+✅ <strong>Checkpoint:</strong> si Genie One encuentra tu Genie de Soporte (gracias a su <strong>título y descripción</strong>, que mencionan Conecta+), responde Chat <strong>6,57</strong> · Email <strong>6,54</strong> · Teléfono <strong>6,47</strong>.</p>
+<blockquote>
+<p>💡 <strong>¿Y si responde con otra tabla o dice que no tiene acceso?</strong> Pasa en workspaces con muchos datos: Genie One eligió otra fuente que encontró. Por eso:
+- <strong>Mencionar con <code>@</code></strong> al especialista es la forma más segura de usar Genie One.
+- Una buena <strong>descripción</strong> en cada Genie (Paso 1 y 3) y preguntas con <strong>contexto</strong> (<em>"de Conecta+"</em>, <em>"sobre facturas"</em>) ayudan a que elija bien.
+- Mira siempre las <strong>citas</strong>: te dicen de dónde salió la respuesta.</p>
+<p>💡 <strong>La idea multi-agent:</strong> una sola puerta de entrada (Genie One) y varios especialistas detrás (tus Genie Agents), cada uno con sus datos y sus reglas.</p>
+<p>🔜 En el <strong>Ej. 9</strong> vas a ver la misma idea <strong>dentro de una app</strong>: el Asistente de la Central de Retención tiene un <strong>router</strong> que elige siempre entre <strong>tus</strong> dos Genies, sin buscar en el resto del workspace.</p>
+</blockquote>
+<h2 id="si-algo-sale-mal">🧯 Si algo sale mal</h2>
+<table>
+<thead>
+<tr>
+<th>Síntoma</th>
+<th>Qué hacer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No aparecen las tablas al crear el Genie</td>
+<td>Escribe el nombre en el buscador; revisa que estés en el catálogo <code>fromzerotohero</code></td>
+</tr>
+<tr>
+<td>El Genie responde algo raro</td>
+<td>Reformula la pregunta con más detalle o revisa el SQL (<strong>Show code</strong>). Puedes agregar una regla en <strong>Instructions</strong></td>
+</tr>
+<tr>
+<td>Genie One respondió con otra tabla o dijo que no tiene acceso</td>
+<td>Menciona a tu Genie con <strong><code>@</code></strong> (Paso 8). Revisa el <strong>Title</strong> y la <strong>Description</strong> del Genie (Pasos 1 y 3)</td>
+</tr>
+<tr>
+<td>No encuentras Genie One en el selector de apps</td>
+<td>Ábrelo con <code>https://&lt;tu-workspace&gt;/one</code>. Si no carga, avisa al instructor</td>
+</tr>
+<tr>
+<td>La respuesta tarda</td>
+<td>Es normal la primera vez: el warehouse se está encendiendo</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lo-que-aprendiste">📌 Lo que aprendiste</h2>
+<ul>
+<li>Un <strong>Genie Agent</strong> responde preguntas de negocio en español, escribiendo el SQL por ti</li>
+<li>Las <strong>Instructions</strong> enseñan reglas del negocio para que la IA no adivine</li>
+<li><strong>Genie One</strong> es una sola puerta de entrada; con <code>@</code> eliges al especialista y con las citas ves de dónde salió cada respuesta</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: 06 - Predicción de Churn (ML)">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                06 - Predicción de Churn (ML)
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../08%20-%20Retenci%C3%B3n%20con%20ML%20y%20GenAI/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: 08 - Retención con ML y GenAI">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                08 - Retención con ML y GenAI
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="/from-zero-to-hero-business/00%20-%20Setup%20y%20teardown/">00 - Setup y teardown</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.top", "navigation.footer", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

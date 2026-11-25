@@ -1,0 +1,1444 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Entrenamiento hands-on de Databricks para usuarios de negocio — Análisis de Clientes y Churn">
+      
+      
+      
+        <link rel="canonical" href="https://carolinaacarneiro.github.io/from-zero-to-hero-business/01%20-%20SQL%20con%20IA/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../02%20-%20Generaci%C3%B3n%20de%20Alertas/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/databricks-symbol.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>01 - SQL con IA - From Zero to Hero · Business Users</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#01-sql-con-ia" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="From Zero to Hero · Business Users" class="md-header__button md-logo" aria-label="From Zero to Hero · Business Users" data-md-component="logo">
+      
+  <img src="../assets/databricks-lockup-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            From Zero to Hero · Business Users
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              01 - SQL con IA
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/carolinaacarneiro/from-zero-to-hero-business" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="From Zero to Hero · Business Users" class="md-nav__button md-logo" aria-label="From Zero to Hero · Business Users" data-md-component="logo">
+      
+  <img src="../assets/databricks-lockup-white.svg" alt="logo">
+
+    </a>
+    From Zero to Hero · Business Users
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/carolinaacarneiro/from-zero-to-hero-business" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 - SQL con IA
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 - SQL con IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#al-terminar-vas-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Al terminar vas a…
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conceptos-de-databricks-de-este-modulo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Conceptos de Databricks de este módulo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antes-de-empezar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Antes de empezar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-1-conocer-la-base-en-unity-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 1: Conocer la base en Unity Catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-2-abrir-el-sql-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 2: Abrir el SQL Editor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-3-crear-tu-schema-personal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 3: Crear tu schema personal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-4-consultas-guiadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 4: Consultas guiadas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-5-genie-code-escribe-el-sql-por-ti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 5: Genie Code escribe el SQL por ti
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-6-opcional-el-historial-de-una-tabla-delta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 6 (opcional): el historial de una tabla Delta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desafio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Desafío
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#si-algo-sale-mal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧯 Si algo sale mal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-aprendiste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Lo que aprendiste
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02%20-%20Generaci%C3%B3n%20de%20Alertas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 - Generación de Alertas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03%20-%20M%C3%A9tricas%20de%20Negocio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 - Métricas de Negocio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04%20-%20IA%20Generativa%20en%20SQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 - IA Generativa en SQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05%20-%20Dashboards%20con%20IA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 - Dashboards con IA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06%20-%20Predicci%C3%B3n%20de%20Churn%20%28ML%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 - Predicción de Churn (ML)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07%20-%20An%C3%A1lisis%20de%20Datos%20Multi-Agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 - Análisis de Datos Multi-Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08%20-%20Retenci%C3%B3n%20con%20ML%20y%20GenAI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 - Retención con ML y GenAI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09%20-%20Creaci%C3%B3n%20de%20Apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 - Creación de Apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10%20-%20Cierre%20%28Pr%C3%B3ximos%20Pasos%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 - Cierre (Próximos Pasos)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#al-terminar-vas-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Al terminar vas a…
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conceptos-de-databricks-de-este-modulo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Conceptos de Databricks de este módulo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antes-de-empezar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Antes de empezar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-1-conocer-la-base-en-unity-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 1: Conocer la base en Unity Catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-2-abrir-el-sql-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 2: Abrir el SQL Editor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-3-crear-tu-schema-personal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 3: Crear tu schema personal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-4-consultas-guiadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 4: Consultas guiadas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-5-genie-code-escribe-el-sql-por-ti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 5: Genie Code escribe el SQL por ti
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paso-6-opcional-el-historial-de-una-tabla-delta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paso 6 (opcional): el historial de una tabla Delta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desafio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Desafío
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#si-algo-sale-mal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧯 Si algo sale mal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lo-que-aprendiste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Lo que aprendiste
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="01-sql-con-ia">01 · SQL con IA</h1>
+<p><img alt="Ruta From Zero to Hero con énfasis en lo construido hasta el Ejercicio 01" src="../assets/arquitectura_01.svg" /></p>
+<blockquote>
+<p><em>Resaltado, lo que ya construiste en la ruta hasta este punto; en gris, lo que todavía viene.</em></p>
+</blockquote>
+<p><strong>⏱️ Tiempo:</strong> 35 min · <strong>📍 Dónde:</strong> Catalog y SQL Editor · <strong>🧰 Lo que usas:</strong> Unity Catalog, SQL Warehouse, Genie Code</p>
+<p>Tu primer contacto con los datos de churn. Vas a <strong>ver</strong> dónde están los datos, <strong>consultarlos</strong> con SQL y pedirle a la IA (<strong>Genie Code</strong>) que escriba el SQL por ti a partir de una pregunta en español.</p>
+<h2 id="al-terminar-vas-a">🎯 Al terminar vas a…</h2>
+<ul>
+<li>Saber cómo se organizan los datos en Databricks (catálogo → schema → tabla)</li>
+<li>Tener tu <strong>schema personal</strong>, donde vas a guardar todo lo que construyas en el curso</li>
+<li>Ejecutar consultas en el <strong>SQL Editor</strong></li>
+<li>Generar SQL con <strong>Genie Code</strong> escribiendo en lenguaje natural</li>
+</ul>
+<h2 id="conceptos-de-databricks-de-este-modulo">🧠 Conceptos de Databricks de este módulo</h2>
+<table>
+<thead>
+<tr>
+<th>Concepto</th>
+<th>Qué es</th>
+<th>Analogía</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unity Catalog</strong></td>
+<td>El sistema que organiza, documenta y protege todos los datos y activos de IA de la empresa</td>
+<td>La biblioteca con su catálogo de fichas</td>
+</tr>
+<tr>
+<td><strong>Catálogo → Schema → Tabla</strong></td>
+<td>La dirección de cada dato, en 3 partes. Ejemplo: <code>fromzerotohero.churn.dim_cliente</code></td>
+<td>Armario → cajón → carpeta</td>
+</tr>
+<tr>
+<td><strong>SQL Editor</strong></td>
+<td>La pantalla donde escribes y ejecutas consultas SQL</td>
+<td>Una hoja en blanco para hacer preguntas a los datos</td>
+</tr>
+<tr>
+<td><strong>SQL Warehouse</strong></td>
+<td>El motor que ejecuta el SQL. Se enciende solo cuando lo usas y se apaga solo</td>
+<td>El motor de un auto</td>
+</tr>
+<tr>
+<td><strong>Genie Code</strong></td>
+<td>El asistente de IA de Databricks para quien desarrolla: escribe y explica SQL y código</td>
+<td>Un colega experto en SQL sentado a tu lado</td>
+</tr>
+<tr>
+<td><strong>Delta</strong></td>
+<td>El formato en que se guardan las tablas. Guarda el historial de cambios</td>
+<td>Un documento con "historial de versiones"</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>📚 <strong>SQL</strong> es el idioma para hacer preguntas a una base de datos. <code>SELECT</code> = "muéstrame", <code>FROM</code> = "de esta tabla", <code>GROUP BY</code> = "agrupado por", <code>ORDER BY</code> = "ordenado por". No necesitas saberlo de memoria: hoy lo vas a copiar y, después, Genie Code lo va a escribir por ti.</p>
+</blockquote>
+<h2 id="antes-de-empezar">✅ Antes de empezar</h2>
+<ul>
+<li>Ejecutaste la <a href="../00%20-%20Setup%20y%20teardown">verificación de ambiente</a> y salió 🟢 o 🟡</li>
+<li>Tienes anotado <strong>tu schema</strong> (ej.: <code>ggarcia</code>)</li>
+</ul>
+<hr />
+<h2 id="paso-1-conocer-la-base-en-unity-catalog">Paso 1: Conocer la base en Unity Catalog</h2>
+<p>Antes de consultar, veamos cómo están organizados los datos.</p>
+<ol>
+<li>En el <strong>menú lateral izquierdo</strong>, haz clic en <strong>Catalog</strong> (ícono de libro/estantería)</li>
+<li>En la lista de catálogos, haz clic en la flecha junto a <strong><code>fromzerotohero</code></strong> para abrirlo</li>
+<li>Abre el schema <strong><code>churn</code></strong>. Es la base compartida del curso: clientes, planes, suscripciones, uso, facturación y tickets de soporte</li>
+<li>Haz clic en la tabla <strong><code>hecho_suscripcion</code></strong>. Se abre su página con varias pestañas:<ul>
+<li><strong>Overview</strong>: las columnas y el comentario de cada una. Busca <code>churn_flag</code>: dice <em>"1 si canceló (churn), 0 si está activo"</em></li>
+<li><strong>Sample Data</strong>: algunas filas de ejemplo, sin escribir SQL</li>
+<li><strong>Details</strong>: dueño, formato (<strong>Delta</strong>) y fecha de creación</li>
+</ul>
+</li>
+<li>En la lista de columnas, fíjate que <code>id_cliente</code> tiene una marca de <strong>FK</strong> (clave foránea): significa que apunta a la tabla <code>dim_cliente</code>. Si aparece el botón <strong>View relationships</strong>, haz clic para ver cómo se conectan las tablas</li>
+</ol>
+<blockquote>
+<p>💡 <strong>¿Por qué importa?</strong> Los comentarios y las relaciones no son solo documentación: son los que ayudan a <strong>Genie Code</strong> (en este módulo) y a los <strong>Genie Agents</strong> (Ej. 7) a escribir el SQL correcto. Datos bien documentados = respuestas de IA confiables.</p>
+</blockquote>
+<p>✅ <strong>Checkpoint:</strong> viste las 8 tablas del schema <code>churn</code> y el comentario de <code>churn_flag</code>.</p>
+<h2 id="paso-2-abrir-el-sql-editor">Paso 2: Abrir el SQL Editor</h2>
+<ol>
+<li>En el menú lateral izquierdo, haz clic en <strong>SQL Editor</strong></li>
+<li>Si no se abre una consulta en blanco, haz clic en <strong>Create new → SQL Query</strong> (o en el <strong>+</strong> de las pestañas)</li>
+<li>Arriba del editor hay un selector de <strong>cómputo</strong>. Elige <strong><code>fromzerotohero_workshop_wh</code></strong></li>
+<li>Junto al botón <strong>Run all</strong> hay un selector de <strong>catálogo y schema</strong>. Elige el catálogo <code>fromzerotohero</code> y el schema <code>churn</code>:</li>
+</ol>
+<p><img alt="Selector de catálogo y schema en el SQL Editor" src="../assets/01%20-%20cat%C3%A1logo%2Bschema%20en%20SQL%20Editor.png" /></p>
+<blockquote>
+<p>💡 <strong>¿Por qué elegir el catálogo y el schema?</strong> Así puedes escribir solo el nombre de la tabla. En este curso igual usamos la dirección completa (<code>fromzerotohero.churn.tabla</code>) para que siempre funcione.</p>
+</blockquote>
+<h2 id="paso-3-crear-tu-schema-personal">Paso 3: Crear tu schema personal</h2>
+<p>Tu <strong>schema personal</strong> es tu espacio de trabajo: a partir del Ej. 3, todo lo que construyas queda ahí.</p>
+<ol>
+<li>Copia la consulta de abajo: pasa el mouse sobre el bloque y haz clic en el ícono de <strong>copiar</strong> (dos cuadrados), en la esquina del bloque</li>
+<li>Pégala en el SQL Editor</li>
+<li>Reemplaza <code>&lt;tu_schema&gt;</code> por tu schema (ej.: <code>ggarcia</code>). Quedaría <code>fromzerotohero.ggarcia</code></li>
+<li>Haz clic en <strong>Run</strong> (o presiona <strong>Ctrl + Enter</strong> / <strong>Cmd + Enter</strong> en Mac)</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">SCHEMA</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="o">&lt;</span><span class="n">tu_schema</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div>
+<p>✅ <strong>Checkpoint:</strong> el resultado dice <code>OK</code>. Si la verificación de ambiente ya lo creó, también dice <code>OK</code> (por el <code>IF NOT EXISTS</code>).</p>
+<h2 id="paso-4-consultas-guiadas">Paso 4: Consultas guiadas</h2>
+<p>Para cada consulta: <strong>copia → pega en el SQL Editor (reemplazando lo anterior) → Run → mira el resultado</strong>.</p>
+<blockquote>
+<p>💡 Si tienes varias consultas en el editor, selecciona solo la que quieres con el mouse antes de hacer clic en <strong>Run</strong>: Databricks ejecuta solo el texto seleccionado.</p>
+</blockquote>
+<p><strong>4.1 ¿Cuántos clientes hay en cada segmento?</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">segmento</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">clientes</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">dim_cliente</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">segmento</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">clientes</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div></p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<table>
+<thead>
+<tr>
+<th>segmento</th>
+<th style="text-align: center;">clientes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consumidor</td>
+<td style="text-align: center;">1.200</td>
+</tr>
+<tr>
+<td>PyME</td>
+<td style="text-align: center;">595</td>
+</tr>
+<tr>
+<td>Corporativo</td>
+<td style="text-align: center;">205</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><strong>4.2 ¿Cuántas suscripciones están activas y cuántas se cancelaron?</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">status</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">cant</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">hecho_suscripcion</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">status</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cant</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div></p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<table>
+<thead>
+<tr>
+<th>status</th>
+<th style="text-align: center;">cant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Activa</td>
+<td style="text-align: center;">1.460</td>
+</tr>
+<tr>
+<td>Cancelada</td>
+<td style="text-align: center;">540</td>
+</tr>
+</tbody>
+</table>
+</details>
+<blockquote>
+<p>💡 540 de 2.000 = <strong>27% de churn</strong>. Este número te va a acompañar todo el curso.</p>
+</blockquote>
+<h2 id="paso-5-genie-code-escribe-el-sql-por-ti">Paso 5: Genie Code escribe el SQL por ti</h2>
+<p><strong>Genie Code</strong> es el asistente de IA para quien trabaja con datos y código. Le describes lo que quieres en español y él escribe el SQL.</p>
+<blockquote>
+<p>⚠️ No lo confundas con los <strong>Genie Agents</strong> del Ej. 7: Genie Code te ayuda a <strong>construir</strong> (escribe SQL y código); un Genie Agent <strong>responde preguntas de negocio</strong> a cualquier persona.</p>
+</blockquote>
+<ol>
+<li>Arriba a la derecha de la pantalla, haz clic en el botón de <strong>Genie Code</strong>. Se abre un panel a la derecha</li>
+<li>Copia <strong>un prompt a la vez</strong> de los de abajo y pégalo en el panel de Genie Code. Presiona <strong>Enter</strong></li>
+<li>Lee el SQL que generó. Si te propone <strong>insertarlo en el editor</strong>, acepta; si no, cópialo al editor</li>
+<li>Haz clic en <strong>Run</strong> y compara con el resultado esperado</li>
+</ol>
+<blockquote>
+<p>💡 <strong>¿Por qué revisar antes de ejecutar?</strong> La IA es muy buena, pero eres tú quien conoce el negocio. Revisar el SQL es como revisar un e-mail antes de enviarlo.</p>
+</blockquote>
+<p><strong>Prompt 1: tasa de churn por segmento</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Escribe el SQL de la tasa de churn por segmento usando la tabla fromzerotohero.churn.feature_churn.
+</code></pre></div></p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">segmento</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">churn_flag</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">tasa_churn</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">feature_churn</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">segmento</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">tasa_churn</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>segmento</th>
+<th style="text-align: center;">tasa_churn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consumidor</td>
+<td style="text-align: center;">0,303</td>
+</tr>
+<tr>
+<td>PyME</td>
+<td style="text-align: center;">0,239</td>
+</tr>
+<tr>
+<td>Corporativo</td>
+<td style="text-align: center;">0,166</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 Como <code>churn_flag</code> vale 1 (canceló) o 0 (activo), su <strong>promedio</strong> es justamente la tasa de churn.</p>
+</blockquote>
+</details>
+<p><strong>Prompt 2: los 5 principales motivos de cancelación</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Escribe una consulta con los 5 principales motivos de cancelación de las suscripciones canceladas (churn_flag = 1) usando la tabla fromzerotohero.churn.hecho_suscripcion.
+</code></pre></div></p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">motivo_cancelacion</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">cant</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">hecho_suscripcion</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">churn_flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">motivo_cancelacion</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cant</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>motivo_cancelacion</th>
+<th style="text-align: center;">cant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insatisfacción</td>
+<td style="text-align: center;">196</td>
+</tr>
+<tr>
+<td>Precio</td>
+<td style="text-align: center;">148</td>
+</tr>
+<tr>
+<td>Competencia</td>
+<td style="text-align: center;">104</td>
+</tr>
+<tr>
+<td>Atención</td>
+<td style="text-align: center;">80</td>
+</tr>
+<tr>
+<td>Cambio de necesidad</td>
+<td style="text-align: center;">12</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 Fíjate en el <code>WHERE churn_flag = 1</code>: sin él, el "motivo" más común sería <em>vacío</em> (las 1.460 suscripciones activas no tienen motivo).</p>
+</blockquote>
+</details>
+<p><strong>Prompt 3: tasa de churn por plan</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Escribe la tasa de churn por plan usando fromzerotohero.churn.hecho_suscripcion y fromzerotohero.churn.dim_plan.
+</code></pre></div></p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">p</span><span class="p">.</span><span class="n">nombre_plan</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">ROUND</span><span class="p">(</span><span class="k">AVG</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">churn_flag</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">tasa_churn</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">hecho_suscripcion</span><span class="w"> </span><span class="n">a</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">dim_plan</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">id_plan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id_plan</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">nombre_plan</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">tasa_churn</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>nombre_plan</th>
+<th style="text-align: center;">tasa_churn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Básico</td>
+<td style="text-align: center;">0,317</td>
+</tr>
+<tr>
+<td>Estándar</td>
+<td style="text-align: center;">0,274</td>
+</tr>
+<tr>
+<td>Premium</td>
+<td style="text-align: center;">0,225</td>
+</tr>
+<tr>
+<td>Empresarial</td>
+<td style="text-align: center;">0,157</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 El <code>JOIN</code> une dos tablas por una columna en común (<code>id_plan</code>). Genie Code lo descubrió solo gracias a las relaciones documentadas en Unity Catalog (Paso 1).</p>
+</blockquote>
+</details>
+<p><strong>Prompt 4: cancelaciones por mes</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Cuenta cuántas suscripciones se cancelaron por mes usando fromzerotohero.churn.hecho_suscripcion, considerando solo las canceladas (churn_flag = 1) según la fecha de cancelación (fecha_fin).
+</code></pre></div></p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SELECT</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">date_trunc</span><span class="p">(</span><span class="s1">'month'</span><span class="p">,</span><span class="w"> </span><span class="n">fecha_fin</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">mes</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">cancelaciones</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">hecho_suscripcion</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">churn_flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>Una fila por mes, de <strong>marzo de 2023 a agosto de 2025</strong>, con entre <strong>11 y 30</strong> cancelaciones por mes.</p>
+<blockquote>
+<p>💡 En el resultado, haz clic en <strong>+</strong> (junto a la tabla de resultados) → <strong>Visualization</strong> y elige <strong>Line</strong> para verlo como gráfico.</p>
+</blockquote>
+</details>
+<h2 id="paso-6-opcional-el-historial-de-una-tabla-delta">Paso 6 (opcional): el historial de una tabla Delta</h2>
+<p>Las tablas <strong>Delta</strong> guardan cada cambio como una <strong>versión</strong>. Puedes ver el historial y hasta consultar cómo era la tabla antes (<strong>time travel</strong>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">-- Historial de versiones de la tabla</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">DESCRIBE</span><span class="w"> </span><span class="n">HISTORY</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">hecho_suscripcion</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1">-- La tabla como estaba en su primera versión (versión 0)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">fromzerotohero</span><span class="p">.</span><span class="n">churn</span><span class="p">.</span><span class="n">hecho_suscripcion</span><span class="w"> </span><span class="k">VERSION</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</code></pre></div>
+<blockquote>
+<p>💡 <strong>¿Para qué sirve?</strong> Si alguien borra o cambia datos por error, puedes ver qué pasó y recuperar la versión anterior.</p>
+</blockquote>
+<h2 id="desafio">🎯 Desafío</h2>
+<p>¿Qué plan tiene la mayor tasa de churn y <strong>cuántos clientes perdió</strong>? Intenta pedírselo a Genie Code con tus propias palabras.</p>
+<details>
+<summary>👉 Resultado esperado</summary>
+<table>
+<thead>
+<tr>
+<th>Plan</th>
+<th style="text-align: center;">Tasa de churn</th>
+<th style="text-align: center;">Clientes perdidos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Básico</strong></td>
+<td style="text-align: center;"><strong>0,317</strong></td>
+<td style="text-align: center;"><strong>257</strong></td>
+</tr>
+<tr>
+<td>Estándar</td>
+<td style="text-align: center;">0,274</td>
+<td style="text-align: center;">160</td>
+</tr>
+<tr>
+<td>Premium</td>
+<td style="text-align: center;">0,225</td>
+<td style="text-align: center;">92</td>
+</tr>
+<tr>
+<td>Empresarial</td>
+<td style="text-align: center;">0,157</td>
+<td style="text-align: center;">31</td>
+</tr>
+</tbody>
+</table>
+<p>➡️ El plan <strong>Básico</strong> concentra el mayor churn: menor barrera de salida y menor valor percibido.</p>
+</details>
+<h2 id="si-algo-sale-mal">🧯 Si algo sale mal</h2>
+<table>
+<thead>
+<tr>
+<th>Síntoma</th>
+<th>Qué hacer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TABLE_OR_VIEW_NOT_FOUND</code></td>
+<td>Revisa que escribiste la dirección completa <code>fromzerotohero.churn.&lt;tabla&gt;</code> y sin espacios</td>
+</tr>
+<tr>
+<td><code>PERMISSION_DENIED</code> en <code>CREATE SCHEMA</code></td>
+<td>Avisa al instructor: falta el permiso <code>CREATE SCHEMA</code> (lo da el Setup)</td>
+</tr>
+<tr>
+<td>No aparece el warehouse <code>fromzerotohero_workshop_wh</code></td>
+<td>Avisa al instructor: falta el permiso <code>CAN USE</code> en el warehouse</td>
+</tr>
+<tr>
+<td>La consulta tarda la primera vez</td>
+<td>Es normal: el warehouse se está encendiendo (unos segundos)</td>
+</tr>
+<tr>
+<td>Genie Code generó un SQL distinto</td>
+<td>¡Puede pasar! Compara el resultado: si los números coinciden, está bien. Si no, pídele que lo corrija describiendo qué esperabas</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lo-que-aprendiste">📌 Lo que aprendiste</h2>
+<ul>
+<li>Los datos viven en <strong>Unity Catalog</strong> con una dirección de 3 partes, documentados y con permisos</li>
+<li>El <strong>SQL Editor</strong> + un <strong>SQL Warehouse</strong> te permiten consultar cualquier tabla</li>
+<li><strong>Genie Code</strong> escribe SQL a partir de tu pregunta; tú revisas y ejecutas</li>
+</ul>
+<blockquote>
+<p>Todas las consultas de este módulo están en <a href="consultas.sql"><code>consultas.sql</code></a>.</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Anterior: Inicio">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Inicio
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../02%20-%20Generaci%C3%B3n%20de%20Alertas/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: 02 - Generación de Alertas">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                02 - Generación de Alertas
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="/from-zero-to-hero-business/00%20-%20Setup%20y%20teardown/">00 - Setup y teardown</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.top", "navigation.footer", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
